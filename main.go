@@ -20,4 +20,5 @@ func evaluateProgramme(prog string) {
 	tokens := lexProgramme(prog)
 	treeRoot := parseProgramme(tokens)
 	os.Stdout.WriteString(walkParseTree(treeRoot))
+	interpProgramme(treeRoot)
 }

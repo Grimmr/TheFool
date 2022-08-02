@@ -12,30 +12,35 @@ type parseTreeNode struct {
 
 func parseProgramme(tokens []lexToken) *parseTreeNode {
 	fmt.Println(tokens)
-	out, err, _ := expandExpr(tokens)
+	out, err, _ := expandExpr1(tokens)
 	if out == nil {
-		os.Stderr.WriteString(err)
+		os.Stderr.WriteString(err + "\n")
 	}
 	return out
 }
 
-func expandExpr(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
-	out, _, newTokens := expandBinExpr(tokens)
+func expandExpr1(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
+	out, err, newtokens := expandBinExpr(tokens)
 	if out != nil {
-		return out, "", newTokens
+		return out, err, newtokens
 	}
 
-	out, _, newTokens = expandName(tokens)
+	return expandExpr2(tokens)
+}
+
+func expandExpr2(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
+	out, err, newtokens := expandName(tokens);
 	if out != nil {
-		return out, "", newTokens
+		return out, err, newtokens
 	}
 
-	return nil, "expeced binary expresion got " + tokens[0].literal + " " + tokens[1].literal + " " + tokens[2].literal, tokens
+	//expand brackets here
+	return out, err, newtokens
 }
 
 func expandName(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
-	if tokens[0].tokenType != lexTokenType_name {
-		return nil, "expected table name but got " + tokens[0].literal, tokens
+	if !expect(tokens, []lexTokenType{lexTokenType_name}) {
+		return nil, "expected table name but got " + topLiteral(tokens), tokens
 	}
 
 	return &parseTreeNode{token: tokens[0]}, "", tokens[1:]
@@ -44,30 +49,23 @@ func expandName(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
 func expandBinExpr(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
 	var out parseTreeNode
 	
-	//try for bin operator at look ahead 1
-	if len(tokens) <= 2 {
-		return nil, "expected binary operation (and, or) but got " + tokens[0].literal, tokens
-	}
-	if tokens[1].tokenType != lexTokenType_and && tokens[1].tokenType != lexTokenType_or {
-		return nil, "expected binary operation (and, or) but got " + tokens[1].literal, tokens
-	}
-	out.token = tokens[1]
-
 	//try for first param
-	child, err, newTokens := expandExpr(tokens)
+	child, err, newTokens := expandExpr2(tokens)
 	if child == nil {
 		return nil, err, tokens
-	} else {
-		tokens = newTokens
 	}
-
+	tokens = newTokens
 	out.children = append(out.children, child)
 
 	//consume our operator
+	if !expect(tokens, []lexTokenType{lexTokenType_and, lexTokenType_or}) {
+		return nil, "expected binary operation (and, or) but got " + topLiteral(tokens), tokens
+	}
+	out.token = tokens[0]
 	tokens = tokens[1:]
 
 	//try for secend param
-	child, err, newTokens = expandExpr(tokens)
+	child, err, newTokens = expandExpr1(tokens)
 	if child == nil {
 		return nil, err, tokens
 	} else {
@@ -87,4 +85,24 @@ func walkParseTree(node *parseTreeNode) string {
 	}
 	out += ")"
 	return out;
+}
+
+func expect(tokens []lexToken, targets []lexTokenType) bool {
+	if len(tokens) > 0 {
+		for _, element := range targets {
+			if element == tokens[0].tokenType {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func topLiteral(tokens []lexToken) string {
+	if len(tokens) > 0 {
+		return tokens[0].literal
+	} else {
+		return "nothing"
+	}
 }
