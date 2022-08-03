@@ -20,12 +20,7 @@ func parseProgramme(tokens []lexToken) *parseTreeNode {
 }
 
 func expandExpr1(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
-	out, err, newtokens := expandBinExpr(tokens)
-	if out != nil {
-		return out, err, newtokens
-	}
-
-	return expandExpr2(tokens)
+	return expandBinExpr(tokens)
 }
 
 func expandExpr2(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
@@ -47,35 +42,55 @@ func expandName(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
 }
 
 func expandBinExpr(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
-	var out parseTreeNode
-	
-	//try for first param
+	var children []*parseTreeNode
+	var operators []lexToken
+
+	//LHS
 	child, err, newTokens := expandExpr2(tokens)
 	if child == nil {
 		return nil, err, tokens
 	}
 	tokens = newTokens
-	out.children = append(out.children, child)
+	children = append(children, child)
+	//now look for (op child)+
+	for true {
+		//consume operator
+		if !expect(tokens, []lexTokenType{lexTokenType_and, lexTokenType_or}) {
+			break
+		}
+		operators = append(operators, tokens[0])
+		tokens = tokens[1:]
 
-	//consume our operator
-	if !expect(tokens, []lexTokenType{lexTokenType_and, lexTokenType_or}) {
-		return nil, "expected binary operation (and, or) but got " + topLiteral(tokens), tokens
-	}
-	out.token = tokens[0]
-	tokens = tokens[1:]
-
-	//try for secend param
-	child, err, newTokens = expandExpr1(tokens)
-	if child == nil {
-		return nil, err, tokens
-	} else {
+		//consume child
+		child, err, newTokens = expandExpr2(tokens)
+		if child == nil {
+			return nil, err, tokens
+		}
 		tokens = newTokens
+		children = append(children, child)
 	}
 
-	out.children = append(out.children, child)
+	//if theres only one child just return it (effective bypass to Expr2)
+	if len(children) == 1 {
+		return children[1], "", tokens
+	}
+
+	//otherwise construct the tree
+	var out *parseTreeNode = new(parseTreeNode)
+	out.token = operators[0]
+	out.children = append(out.children, children[0])
+	out.children = append(out.children, children[1])
+	for i := range operators[1:] {
+		var holder *parseTreeNode = new(parseTreeNode)
+		holder.token = operators[i]
+		holder.children = append(holder.children, out)
+		holder.children = append(holder.children, children[2+i])
+		out = holder
+	}
+
 
 	//return the generated node and consume tokens
-	return &out, "", tokens
+	return out, "", tokens
 }
 
 func walkParseTree(node *parseTreeNode) string {
