@@ -17,6 +17,9 @@ func lexProgramme(prog string) []lexToken {
 	var out []lexToken //10 is an abitry starting value for a dynamic array
 	var buffer string //used to store multicharacter token literals during lexing
 
+	//append a dummy whitespace to the back of the programme so we don't have to manually flush the buffer at EOF
+	prog += " "
+
 	for _, letter := range prog {
 		if(letter != ' ' && letter != '\n') {
 			buffer += string(letter)
