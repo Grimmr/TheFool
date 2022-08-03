@@ -2,24 +2,11 @@ package main
 
 import (
 	"os"
-	"fmt"
+	"github.com/Grimmr/TheFool/Headless" 
 )
 
 func main() {
-	//concatinate all parameters into the expresion we are going to evaluate
-	var expr string
-	for _, element := range os.Args[1:] {
-		expr += element + " "
+	if len(os.Args) > 1 {
+		Headless.RunCmdMode(os.Args[1:])
 	}
-
-	evaluateProgramme(expr)
-}
-
-func evaluateProgramme(prog string) {
-	fmt.Println(prog)
-	tokens := lexProgramme(prog)
-	fmt.Println(tokens)
-	treeRoot := parseProgramme(tokens)
-	os.Stdout.WriteString(walkParseTree(treeRoot))
-	interpProgramme(treeRoot)
 }

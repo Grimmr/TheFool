@@ -1,15 +1,15 @@
-package main
+package Parser
 
 import (
 	"os"
 )
 
-type parseTreeNode struct {
+type ParseTreeNode struct {
 	token lexToken
-	children []*parseTreeNode
+	children []*ParseTreeNode
 }
 
-func parseProgramme(tokens []lexToken) *parseTreeNode {
+func ParseProgramme(tokens []lexToken) *ParseTreeNode {
 	out, err, _ := expandExpr1(tokens)
 	if out == nil {
 		os.Stderr.WriteString(err + "\n")
@@ -17,11 +17,11 @@ func parseProgramme(tokens []lexToken) *parseTreeNode {
 	return out
 }
 
-func expandExpr1(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
+func expandExpr1(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 	return expandBinExpr(tokens)
 }
 
-func expandExpr2(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
+func expandExpr2(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 	out, err, newtokens := expandName(tokens);
 	if out != nil {
 		return out, err, newtokens
@@ -31,16 +31,16 @@ func expandExpr2(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
 	return out, err, newtokens
 }
 
-func expandName(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
+func expandName(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 	if !expect(tokens, []lexTokenType{lexTokenType_name}) {
 		return nil, "expected table name but got " + topLiteral(tokens), tokens
 	}
 
-	return &parseTreeNode{token: tokens[0]}, "", tokens[1:]
+	return &ParseTreeNode{token: tokens[0]}, "", tokens[1:]
 }
 
-func expandBinExpr(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
-	var children []*parseTreeNode
+func expandBinExpr(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
+	var children []*ParseTreeNode
 	var operators []lexToken
 
 	//LHS
@@ -74,12 +74,12 @@ func expandBinExpr(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
 	}
 
 	//otherwise construct the tree
-	var out *parseTreeNode = new(parseTreeNode)
+	var out *ParseTreeNode = new(ParseTreeNode)
 	out.token = operators[0]
 	out.children = append(out.children, children[0])
 	out.children = append(out.children, children[1])
 	for i := range operators[1:] {
-		var holder *parseTreeNode = new(parseTreeNode)
+		var holder *ParseTreeNode = new(ParseTreeNode)
 		holder.token = operators[i+1]
 		holder.children = append(holder.children, out)
 		holder.children = append(holder.children, children[2+i])
@@ -91,10 +91,10 @@ func expandBinExpr(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
 	return out, "", tokens
 }
 
-func walkParseTree(node *parseTreeNode) string {
+func WalkParseTree(node *ParseTreeNode) string {
 	out := "(" + node.token.literal 
 	for _, element := range node.children {
-		out += " " + walkParseTree(element)
+		out += " " + WalkParseTree(element)
 	}
 	out += ")"
 	return out;

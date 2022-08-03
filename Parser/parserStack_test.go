@@ -1,4 +1,4 @@
-package main
+package Parser
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 func TestLexProgrammeKeywords(t *testing.T) {
 	//should include one of every token
 	programme := "and or a.txt"
-	result := lexProgramme(programme)
+	result := LexProgramme(programme)
 	expected := []lexToken{lexToken{"and", lexTokenType_and}, lexToken{"or", lexTokenType_or}, lexToken{"a.txt", lexTokenType_name}}
 
 	t.Logf("Lex returned %v", result)
@@ -24,10 +24,10 @@ func TestLexProgrammeKeywords(t *testing.T) {
 	} 
 }
 
-//walkParseTree tests
+//WalkParseTree tests
 func TestWalkParseTree(t *testing.T) {
-	programme := &parseTreeNode{lexToken{"and", lexTokenType_and}, []*parseTreeNode{&parseTreeNode{lexToken{"or", lexTokenType_or}, []*parseTreeNode{&parseTreeNode{lexToken{"a", lexTokenType_name}, nil}, &parseTreeNode{lexToken{"b", lexTokenType_name}, nil}}}, &parseTreeNode{lexToken{"c", lexTokenType_name}, nil}}}
-	result := walkParseTree(programme)
+	programme := &ParseTreeNode{lexToken{"and", lexTokenType_and}, []*ParseTreeNode{&ParseTreeNode{lexToken{"or", lexTokenType_or}, []*ParseTreeNode{&ParseTreeNode{lexToken{"a", lexTokenType_name}, nil}, &ParseTreeNode{lexToken{"b", lexTokenType_name}, nil}}}, &ParseTreeNode{lexToken{"c", lexTokenType_name}, nil}}}
+	result := WalkParseTree(programme)
 	expected := "(and (or (a) (b)) (c))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
@@ -38,7 +38,7 @@ func TestWalkParseTree(t *testing.T) {
 //a simple one level test of and
 func TestParseOnly(t *testing.T) {
 	programme := []lexToken{lexToken{"a", lexTokenType_name}, lexToken{"and", lexTokenType_and}, lexToken{"b", lexTokenType_name}}
-	result := walkParseTree(parseProgramme(programme)) 
+	result := WalkParseTree(ParseProgramme(programme)) 
 	expected := "(and (a) (b))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
@@ -49,7 +49,7 @@ func TestParseOnly(t *testing.T) {
 //operator checks
 func TestParseAnd(t *testing.T) {
 	programme := "a and b"
-	result := walkParseTree(parseProgramme(lexProgramme(programme)))
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
 	expected := "(and (a) (b))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
@@ -58,7 +58,7 @@ func TestParseAnd(t *testing.T) {
 
 func TestParseOr(t *testing.T) {
 	programme := "a or b"
-	result := walkParseTree(parseProgramme(lexProgramme(programme)))
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
 	expected := "(or (a) (b))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
@@ -67,7 +67,7 @@ func TestParseOr(t *testing.T) {
 
 func TestParseAndOr(t *testing.T) {
 	programme := "a and b or c"
-	result := walkParseTree(parseProgramme(lexProgramme(programme)))
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
 	expected := "(or (and (a) (b)) (c))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
@@ -77,7 +77,7 @@ func TestParseAndOr(t *testing.T) {
 //example programmes
 func TestParseProgrammeAndOr(t *testing.T) {
 	programme := "dogs1.csv and dogs2.csv or cats.csv"
-	result := walkParseTree(parseProgramme(lexProgramme(programme)))
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
 	expected := "(or (and (dogs1.csv) (dogs2.csv)) (cats.csv))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
@@ -85,7 +85,7 @@ func TestParseProgrammeAndOr(t *testing.T) {
 }
 
 //helpers
-func compareTrees(a *parseTreeNode, b *parseTreeNode) bool {
+func compareTrees(a *ParseTreeNode, b *ParseTreeNode) bool {
 	if a.token != b.token {
 		return false
 	}

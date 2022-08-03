@@ -1,4 +1,4 @@
-package main
+package Parser
 
 type lexTokenType int
 
@@ -13,7 +13,7 @@ const (
 	lexTokenType_and
 )
 
-func lexProgramme(prog string) []lexToken {
+func LexProgramme(prog string) []lexToken {
 	var out []lexToken //10 is an abitry starting value for a dynamic array
 	var buffer string //used to store multicharacter token literals during lexing
 
