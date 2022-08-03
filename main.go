@@ -18,6 +18,7 @@ func main() {
 func evaluateProgramme(prog string) {
 	fmt.Println(prog)
 	tokens := lexProgramme(prog)
+	fmt.Println(tokens)
 	treeRoot := parseProgramme(tokens)
 	os.Stdout.WriteString(walkParseTree(treeRoot))
 	interpProgramme(treeRoot)

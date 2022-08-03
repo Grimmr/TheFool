@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"fmt"
 )
 
 type parseTreeNode struct {
@@ -11,7 +10,6 @@ type parseTreeNode struct {
 }
 
 func parseProgramme(tokens []lexToken) *parseTreeNode {
-	fmt.Println(tokens)
 	out, err, _ := expandExpr1(tokens)
 	if out == nil {
 		os.Stderr.WriteString(err + "\n")
@@ -82,7 +80,7 @@ func expandBinExpr(tokens []lexToken) (*parseTreeNode, string, []lexToken) {
 	out.children = append(out.children, children[1])
 	for i := range operators[1:] {
 		var holder *parseTreeNode = new(parseTreeNode)
-		holder.token = operators[i]
+		holder.token = operators[i+1]
 		holder.children = append(holder.children, out)
 		holder.children = append(holder.children, children[2+i])
 		out = holder
