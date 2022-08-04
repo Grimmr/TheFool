@@ -6,18 +6,18 @@ import(
 )
 
 type Csv struct {
-	headers []string
-	data []map[string]string
-	raw string
-	rawPos int
-	endRow byte
-	endField byte
+	Headers []string
+	Data []map[string]string
+	Raw string
+	RawPos int
+	EndRow byte
+	EndField byte
 }
 
 func NewCsv () *Csv {
 	var out Csv
-	out.endRow = byte('\n')
-	out.endField = byte(',')
+	out.EndRow = byte('\n')
+	out.EndField = byte(',')
 	return &out
 }
 
@@ -28,10 +28,10 @@ func checkErr(e error) {
 }
 
 func (this *Csv) empty () {
-	this.headers = []string{}
-	this.data = []map[string]string{}
-	this.raw = ""
-	this.rawPos = 0
+	this.Headers = []string{}
+	this.Data = []map[string]string{}
+	this.Raw = ""
+	this.RawPos = 0
 }
 
 func (this *Csv) Read (path string) bool {
@@ -41,7 +41,7 @@ func (this *Csv) Read (path string) bool {
 	//attempt to read file into a buffer
 	bytes, err := ioutil.ReadFile(path)
 	checkErr(err)
-	this.raw = string(bytes)
+	this.Raw = string(bytes)
 
 
 	var lineBuffer []string
@@ -49,24 +49,24 @@ func (this *Csv) Read (path string) bool {
 	//parse headers
 	lineBuffer, _ = this.parseLine()
 	for _, col := range lineBuffer {
-		this.headers = append(this.headers, strings.TrimSpace(col))
+		this.Headers = append(this.Headers, strings.TrimSpace(col))
 	}
 
 	//read lines
 	for lineBuffer, cont := this.parseLine(); cont; lineBuffer, cont = this.parseLine() {
 		row := make(map[string]string) 
 		//check row width
-		if len(lineBuffer) != len(this.headers) {
+		if len(lineBuffer) != len(this.Headers) {
 			continue
 		}
 
 		//create row
 		for index, col := range lineBuffer {
-			row[this.headers[index]] = strings.TrimSpace(col)
+			row[this.Headers[index]] = strings.TrimSpace(col)
 		}
 
 		//add row
-		this.data = append(this.data, row)
+		this.Data = append(this.Data, row)
 	}
 
 	return true
@@ -77,19 +77,19 @@ func (this *Csv) parseLine () ([]string, bool) {
 	var buffer string
 
 	//stop on blank line or EOF
-	if this.rawPos >= len(this.raw) || this.raw[this.rawPos] == this.endRow {
+	if this.RawPos >= len(this.Raw) || this.Raw[this.RawPos] == this.EndRow {
 		return out, false
 	}
 
-	for ; this.rawPos < len(this.raw); this.rawPos++ {
-		char := this.raw[this.rawPos]
-		if char == this.endField {
+	for ; this.RawPos < len(this.Raw); this.RawPos++ {
+		char := this.Raw[this.RawPos]
+		if char == this.EndField {
 			out = append(out, buffer)
 			buffer = ""
-		} else if char == this.endRow {
+		} else if char == this.EndRow {
 			out = append(out, buffer)
 			buffer = ""
-			this.rawPos++
+			this.RawPos++
 			return out, true
 		} else {
 			buffer += string(char)
