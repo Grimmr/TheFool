@@ -209,7 +209,23 @@ func TestReadDouble (t *testing.T) {
 	compareData(expectedTable.Data, table.Data, true, t)
 }
 
+func TestOperatorOrSimple (t *testing.T) {
+	headers := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}}
+	lhs := constructTable(headers, lhsData)
 
+	rhsData := [][]string{[]string{"b"}}
+	rhs := constructTable(headers, rhsData)
+
+	result := lhs.OperatorOr(rhs)
+
+	expectedData := [][]string{
+		[]string{"a"},
+		[]string{"b"}}
+	expected := constructTable(headers, expectedData)
+
+	compareData(expected.Data, result.Data, true, t)
+}
 
 
 //helpers
