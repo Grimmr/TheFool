@@ -18,6 +18,7 @@ func NewCsv () *Csv {
 	var out Csv
 	out.EndRow = byte('\n')
 	out.EndField = byte(',')
+	out.empty()
 	return &out
 }
 
@@ -99,4 +100,86 @@ func (this *Csv) parseLine () ([]string, bool) {
 		out = append(out, buffer)
 	}
 	return out, len(out) != 0 
+} 
+
+//this assumes the header isn't a dupe
+func (this *Csv) insertHeader(header string) {
+	//add the header
+	this.Headers = append(this.Headers, header)
+	
+	//add entries for each row
+	for _, row := range this.Data {
+		row[header] = ""
+	}
+}
+
+func (this *Csv) insertRow(row map[string]string) {
+	//create new row object
+	var newRow map[string]string
+	for k, v := range row {
+		newRow[k] = v
+	}
+
+	//add the row
+	this.Data = append(this.Data, newRow) 
+}
+
+func (this *Csv) OperatorOr(rhs *Csv) *Csv {
+	out := NewCsv()
+
+	//select Headers
+	///copy lhs headers
+	for _, element := range this.Headers {
+		out.insertHeader(element)
+	}
+	//add only needed rhs headers
+	for _, targetHeader := range rhs.Headers {
+		add := true
+		for _, checkHeader := range this.Headers {
+			if targetHeader == checkHeader {
+				add = false
+				break
+			}
+		}
+		if add {
+			out.insertHeader(targetHeader)
+		}
+	}
+
+	//copy lhs into out
+	for _, element := range this.Data {
+		out.insertRow(element)
+	}
+
+	//copy only needed rhs rows
+	for _, targetRow := range rhs.Data {
+		add := true
+		for _, checkRow := range this.Data {
+			if matchRow(targetRow, checkRow) {
+				add = false
+				break
+			}
+		}
+		if add {
+			out.insertRow(targetRow)
+		}
+	}
+
+	return out 
+}
+
+func matchRow(lhs map[string]string, rhs map[string]string) bool {
+	if len(lhs) != len(rhs) {
+		return false
+	}
+
+	for k, _ := range lhs {
+		if _, ok := rhs[k]; !ok {
+			return false
+		}
+		if lhs[k] != rhs[k] {
+			return false
+		}
+	}
+	return true
 } 
