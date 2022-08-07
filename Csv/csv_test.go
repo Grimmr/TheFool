@@ -98,93 +98,29 @@ func TestParseLineTrailingNewLine(t *testing.T) {
 func TestRead (t *testing.T) {
 	table := NewCsv()
 	table.Read("test_data/dogs2.csv")
-	
-	//row count
-	if len(table.Data) != 3 {
-		t.Errorf("expected 3 rows, got %d", len(table.Data))
-	}
-	//headers 
-	t.Logf("headers")
-	expected := []string{"name", "breed", "age"}
-	if !reflect.DeepEqual(expected,table.Headers) {
-		t.Errorf("expected %v, got %v", expected, table.Headers)
-	}
-	//row 0
-	t.Logf("Row 0")
-	expected = []string{"spike", "greyhound", "2"}
-	act := []string{table.Data[0]["name"], table.Data[0]["breed"], table.Data[0]["age"]}
-	if !reflect.DeepEqual(expected,act) {
-		t.Errorf("expected %v, got %v", expected, act)
-	}
-	if len(table.Data[0]) != len(expected) {
-		t.Errorf("expected width %d, got %d", len(expected), len(table.Data[0]))
-	}
-	//row 1
-	t.Logf("Row 1")
-	expected = []string{"clara", "wolfhound", "5"}
-	act = []string{table.Data[1]["name"], table.Data[1]["breed"], table.Data[1]["age"]}
-	if !reflect.DeepEqual(expected,act) {
-		t.Errorf("expected %v, got %v", expected, act)
-	}
-	if len(table.Data[1]) != len(expected) {
-		t.Errorf("expected width %d, got %d", len(expected), len(table.Data[1]))
-	}
-	//row 2
-	t.Logf("Row 2")
-	expected = []string{"mike", "jack russel", "12"}
-	act = []string{table.Data[2]["name"], table.Data[2]["breed"], table.Data[2]["age"]}
-	if !reflect.DeepEqual(expected,act) {
-		t.Errorf("expected %v, got %v", expected, act)
-	}
-	if len(table.Data[2]) != len(expected) {
-		t.Errorf("expected width %d, got %d", len(expected), len(table.Data[2]))
-	}
+
+	expectedHeaders := []string{"name", "breed", "age"}
+	expectedData := [][]string{
+		[]string{"spike", "greyhound", "2"},
+		[]string{"clara", "wolfhound", "5"},
+		[]string{"mike", "jack russel", "12"}}
+	expectedTable := constructTable(expectedHeaders, expectedData)
+
+	compareData(expectedTable.Data, table.Data, true, t)
 }
 
 func TestReadTrailingNewLine (t *testing.T) {
 	table := NewCsv()
 	table.Read("test_data/dogs1.csv")
-	
-	//row count
-	if len(table.Data) != 3 {
-		t.Errorf("expected 3 rows, got %d", len(table.Data))
-	}
-	//headers 
-	t.Logf("headers")
-	expected := []string{"name", "breed", "age"}
-	if !reflect.DeepEqual(expected,table.Headers) {
-		t.Errorf("expected %v, got %v", expected, table.Headers)
-	}
-	//row 0
-	t.Logf("Row 0")
-	expected = []string{"spike", "greyhound", "2"}
-	act := []string{table.Data[0]["name"], table.Data[0]["breed"], table.Data[0]["age"]}
-	if !reflect.DeepEqual(expected,act) {
-		t.Errorf("expected %v, got %v", expected, act)
-	}
-	if len(table.Data[0]) != len(expected) {
-		t.Errorf("expected width %d, got %d", len(expected), len(table.Data[0]))
-	}
-	//row 1
-	t.Logf("Row 1")
-	expected = []string{"clara", "wolfhound", "5"}
-	act = []string{table.Data[1]["name"], table.Data[1]["breed"], table.Data[1]["age"]}
-	if !reflect.DeepEqual(expected,act) {
-		t.Errorf("expected %v, got %v", expected, act)
-	}
-	if len(table.Data[1]) != len(expected) {
-		t.Errorf("expected width %d, got %d", len(expected), len(table.Data[1]))
-	}
-	//row 2
-	t.Logf("Row 2")
-	expected = []string{"mike", "jack russel", "12"}
-	act = []string{table.Data[2]["name"], table.Data[2]["breed"], table.Data[2]["age"]}
-	if !reflect.DeepEqual(expected,act) {
-		t.Errorf("expected %v, got %v", expected, act)
-	}
-	if len(table.Data[2]) != len(expected) {
-		t.Errorf("expected width %d, got %d", len(expected), len(table.Data[2]))
-	}
+
+	expectedHeaders := []string{"name", "breed", "age"}
+	expectedData := [][]string{
+		[]string{"spike", "greyhound", "2"},
+		[]string{"clara", "wolfhound", "5"},
+		[]string{"mike", "jack russel", "12"}}
+	expectedTable := constructTable(expectedHeaders, expectedData)
+
+	compareData(expectedTable.Data, table.Data, true, t)
 }
 
 func TestReadDouble (t *testing.T) {
