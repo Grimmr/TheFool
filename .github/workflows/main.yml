@@ -1,4 +1,4 @@
-name: UnitTests
+name: Testing
 on:
   pull_request:
     branches: [ "main" ]
@@ -10,5 +10,5 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Run "go test"
+      - name: unit tests
         run: go test ./...
