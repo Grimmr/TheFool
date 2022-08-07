@@ -99,7 +99,12 @@ func TestRead (t *testing.T) {
 	table := NewCsv()
 	table.Read("test_data/dogs2.csv")
 
+	t.Logf("headers")
 	expectedHeaders := []string{"name", "breed", "age"}
+	if !reflect.DeepEqual(expectedHeaders,table.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, table.Headers)
+	}
+
 	expectedData := [][]string{
 		[]string{"spike", "greyhound", "2"},
 		[]string{"clara", "wolfhound", "5"},
@@ -113,7 +118,12 @@ func TestReadTrailingNewLine (t *testing.T) {
 	table := NewCsv()
 	table.Read("test_data/dogs1.csv")
 
+	t.Logf("headers")
 	expectedHeaders := []string{"name", "breed", "age"}
+	if !reflect.DeepEqual(expectedHeaders,table.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, table.Headers)
+	}
+
 	expectedData := [][]string{
 		[]string{"spike", "greyhound", "2"},
 		[]string{"clara", "wolfhound", "5"},
@@ -163,6 +173,29 @@ func TestOperatorOrSimple (t *testing.T) {
 	compareData(expected.Data, result.Data, true, t)
 }
 
+func TestOperatorOrNewHeaderSimple (t *testing.T) {
+	lhsheaders := []string{"h1", "lh"}
+	lhsData := [][]string{[]string{"a", "b"}}
+	lhs := constructTable(lhsheaders, lhsData)
+
+	rhsheaders := []string{"h1", "rh"}
+	rhsData := [][]string{[]string{"c", "d"}}
+	rhs := constructTable(rhsheaders, rhsData)
+
+	result := lhs.OperatorOr(rhs)
+
+	expectedHeaders := []string{"h1", "lh", "rh"}
+	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{
+		[]string{"a", "b", ""}, 
+		[]string{"c", "", "d"}}
+	expected := constructTable(expectedHeaders, expectedData)
+
+	compareData(expected.Data, result.Data, true, t)
+}
 
 //helpers
 func constructTable(headers []string, data [][]string) *Csv {

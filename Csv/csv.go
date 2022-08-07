@@ -113,11 +113,16 @@ func (this *Csv) insertHeader(header string) {
 	}
 }
 
-func (this *Csv) insertRow(row map[string]string) {
+func (this *Csv) insertRow(extraHeaders []string, row map[string]string) {
 	//create new row object
 	newRow := make(map[string]string)
 	for k, v := range row {
 		newRow[k] = v
+	} 
+
+	//add new headers
+	for _, header := range extraHeaders {
+		newRow[header] = ""
 	}
 
 	//add the row
@@ -129,10 +134,21 @@ func (this *Csv) OperatorOr(rhs *Csv) *Csv {
 
 	//select Headers
 	///copy lhs headers
+	lhsHeaders := []string{} //this is all the ehaders only on lhs
 	for _, element := range this.Headers {
 		out.insertHeader(element)
+		add := true
+		for _, check := range rhs.Headers {
+			if element == check {
+				add = false
+			}
+		}
+		if add {
+			lhsHeaders = append(lhsHeaders, element)
+		}
 	}
 	//add only needed rhs headers
+	rhsHeaders := []string{} //this is all the headers only on rhs
 	for _, targetHeader := range rhs.Headers {
 		add := true
 		for _, checkHeader := range this.Headers {
@@ -143,12 +159,13 @@ func (this *Csv) OperatorOr(rhs *Csv) *Csv {
 		}
 		if add {
 			out.insertHeader(targetHeader)
+			rhsHeaders = append(rhsHeaders, targetHeader)
 		}
 	}
 
 	//copy lhs into out
 	for _, element := range this.Data {
-		out.insertRow(element)
+		out.insertRow(rhsHeaders, element)
 	}
 
 	//copy only needed rhs rows
@@ -161,7 +178,7 @@ func (this *Csv) OperatorOr(rhs *Csv) *Csv {
 			}
 		}
 		if add {
-			out.insertRow(targetRow)
+			out.insertRow(lhsHeaders, targetRow)
 		}
 	}
 
