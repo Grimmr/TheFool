@@ -192,44 +192,58 @@ func TestReadDouble (t *testing.T) {
 	table.Read("test_data/dogs1.csv")
 	table.Read("test_data/people.csv")
 
-	//row count
-	if len(table.Data) != 3 {
-		t.Errorf("expected 3 rows, got %d", len(table.Data))
-	}
 	//headers 
 	t.Logf("headers")
-	expected := []string{"name", "age", "pay"}
-	if !reflect.DeepEqual(expected,table.Headers) {
-		t.Errorf("expected %v, got %v", expected, table.Headers)
+	expectedHeaders := []string{"name", "age", "pay"}
+	if !reflect.DeepEqual(expectedHeaders,table.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, table.Headers)
 	}
-	//row 0
-	t.Logf("Row 0")
-	expected = []string{"tim", "22", "21000"}
-	act := []string{table.Data[0]["name"], table.Data[0]["age"], table.Data[0]["pay"]}
-	if !reflect.DeepEqual(expected,act) {
-		t.Errorf("expected %v, got %v", expected, act)
+
+	expectedData := [][]string{
+		[]string{"tim", "22", "21000"},
+		[]string{"tina", "40", "38000"},
+		[]string{"clara", "35", "30000"}}
+
+	expectedTable := constructTable(expectedHeaders, expectedData)
+
+	compareData(expectedTable.Data, table.Data, true, t)
+}
+
+
+
+
+//helpers
+func constructTable(headers []string, data [][]string) *Csv {
+	out := NewCsv()
+	out.Headers = headers
+
+	for _, row := range data {
+		newRow := make(map[string]string)
+		for index,  field := range row {
+			newRow[headers[index]] = field
+		}
+		out.Data = append(out.Data, newRow)
 	}
-	if len(table.Data[0]) != len(expected) {
-		t.Errorf("expected width %d, got %d", len(expected), len(table.Data[0]))
+
+	return out
+}
+
+func compareData(expected []map[string]string, actual []map[string]string, checkAllWidths bool, t *testing.T) {
+	if len(expected) != len(actual) {
+		t.Fatalf("expected %d rows, but got %d", len(expected), len(actual))
 	}
-	//row 1
-	t.Logf("Row 1")
-	expected = []string{"tina", "40", "38000"}
-	act = []string{table.Data[1]["name"], table.Data[1]["age"], table.Data[1]["pay"]}
-	if !reflect.DeepEqual(expected,act) {
-		t.Errorf("expected %v, got %v", expected, act)
-	}
-	if len(table.Data[1]) != len(expected) {
-		t.Errorf("expected width %d, got %d", len(expected), len(table.Data[1]))
-	}
-	//row 2
-	t.Logf("Row 2")
-	expected = []string{"clara", "35", "30000"}
-	act = []string{table.Data[2]["name"], table.Data[2]["age"], table.Data[2]["pay"]}
-	if !reflect.DeepEqual(expected,act) {
-		t.Errorf("expected %v, got %v", expected, act)
-	}
-	if len(table.Data[2]) != len(expected) {
-		t.Errorf("expected width %d, got %d", len(expected), len(table.Data[2]))
-	}
-} 
+
+	var checkWidth = true
+	for index := range expected {
+		if checkWidth && len(expected[index]) != len(actual[index]) {
+			t.Errorf("expected row %d to have %d fields, but found %d", index, len(expected[index]), len(actual[index]))
+			checkWidth = checkAllWidths
+		}
+
+		for k, _ := range expected[index] {
+			if expected[index][k] != actual[index][k] {
+				t.Errorf("expected row %d, field %s to have value %s, but found %s", index, k, expected[index][k], actual[index][k])
+			}
+		}
+	} 
+}
