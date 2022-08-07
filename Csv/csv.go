@@ -115,7 +115,7 @@ func (this *Csv) insertHeader(header string) {
 
 func (this *Csv) insertRow(row map[string]string) {
 	//create new row object
-	var newRow map[string]string
+	newRow := make(map[string]string)
 	for k, v := range row {
 		newRow[k] = v
 	}
