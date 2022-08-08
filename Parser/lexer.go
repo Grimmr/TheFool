@@ -3,14 +3,14 @@ package Parser
 type lexTokenType int
 
 type lexToken struct {
-	literal string
-	tokenType lexTokenType
+	Literal string
+	TokenType lexTokenType
 }
 
 const (
-	lexTokenType_name = iota
-	lexTokenType_or
-	lexTokenType_and
+	LexTokenType_name = iota
+	LexTokenType_or
+	LexTokenType_and
 )
 
 func LexProgramme(prog string) []lexToken {
@@ -26,11 +26,11 @@ func LexProgramme(prog string) []lexToken {
 		} else {
 			switch buffer {
 			case "and": 
-				out = append(out, lexToken{buffer, lexTokenType_and})
+				out = append(out, lexToken{buffer, LexTokenType_and})
 			case "or": 
-				out = append(out, lexToken{buffer, lexTokenType_or})
+				out = append(out, lexToken{buffer, LexTokenType_or})
 			default:
-				out = append(out, lexToken{buffer, lexTokenType_name})
+				out = append(out, lexToken{buffer, LexTokenType_name})
 			}
 			buffer = ""
 		}

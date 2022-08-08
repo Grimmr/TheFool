@@ -3,6 +3,7 @@ package Csv
 import(
 	"io/ioutil"
 	"strings"
+	"testing"
 )
 
 type Csv struct {
@@ -200,3 +201,39 @@ func matchRow(lhs map[string]string, rhs map[string]string) bool {
 	}
 	return true
 } 
+
+//helpers that should be in a test file but cant due to export semantics
+func ConstructTable(headers []string, data [][]string) *Csv {
+	out := NewCsv()
+	out.Headers = headers
+
+	for _, row := range data {
+		newRow := make(map[string]string)
+		for index,  field := range row {
+			newRow[headers[index]] = field
+		}
+		out.Data = append(out.Data, newRow)
+	}
+
+	return out
+}
+
+func CompareData(expected []map[string]string, actual []map[string]string, checkAllWidths bool, t *testing.T) {
+	if len(expected) != len(actual) {
+		t.Fatalf("expected %d rows, but got %d", len(expected), len(actual))
+	}
+
+	var checkWidth = true
+	for index := range expected {
+		if checkWidth && len(expected[index]) != len(actual[index]) {
+			t.Errorf("expected row %d to have %d fields, but found %d", index, len(expected[index]), len(actual[index]))
+			checkWidth = checkAllWidths
+		}
+
+		for k, _ := range expected[index] {
+			if expected[index][k] != actual[index][k] {
+				t.Errorf("expected row %d, field %s to have value %s, but found %s", index, k, expected[index][k], actual[index][k])
+			}
+		}
+	} 
+}

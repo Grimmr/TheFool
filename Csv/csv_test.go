@@ -109,9 +109,9 @@ func TestRead (t *testing.T) {
 		[]string{"spike", "greyhound", "2"},
 		[]string{"clara", "wolfhound", "5"},
 		[]string{"mike", "jack russel", "12"}}
-	expectedTable := constructTable(expectedHeaders, expectedData)
+	expectedTable := ConstructTable(expectedHeaders, expectedData)
 
-	compareData(expectedTable.Data, table.Data, true, t)
+	CompareData(expectedTable.Data, table.Data, true, t)
 }
 
 func TestReadTrailingNewLine (t *testing.T) {
@@ -128,9 +128,9 @@ func TestReadTrailingNewLine (t *testing.T) {
 		[]string{"spike", "greyhound", "2"},
 		[]string{"clara", "wolfhound", "5"},
 		[]string{"mike", "jack russel", "12"}}
-	expectedTable := constructTable(expectedHeaders, expectedData)
+	expectedTable := ConstructTable(expectedHeaders, expectedData)
 
-	compareData(expectedTable.Data, table.Data, true, t)
+	CompareData(expectedTable.Data, table.Data, true, t)
 }
 
 func TestReadDouble (t *testing.T) {
@@ -150,37 +150,37 @@ func TestReadDouble (t *testing.T) {
 		[]string{"tina", "40", "38000"},
 		[]string{"clara", "35", "30000"}}
 
-	expectedTable := constructTable(expectedHeaders, expectedData)
+	expectedTable := ConstructTable(expectedHeaders, expectedData)
 
-	compareData(expectedTable.Data, table.Data, true, t)
+	CompareData(expectedTable.Data, table.Data, true, t)
 }
 
 func TestOperatorOrSimple (t *testing.T) {
 	headers := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}}
-	lhs := constructTable(headers, lhsData)
+	lhs := ConstructTable(headers, lhsData)
 
 	rhsData := [][]string{[]string{"b"}}
-	rhs := constructTable(headers, rhsData)
+	rhs := ConstructTable(headers, rhsData)
 
 	result := lhs.OperatorOr(rhs)
 
 	expectedData := [][]string{
 		[]string{"a"},
 		[]string{"b"}}
-	expected := constructTable(headers, expectedData)
+	expected := ConstructTable(headers, expectedData)
 
-	compareData(expected.Data, result.Data, true, t)
+	CompareData(expected.Data, result.Data, true, t)
 }
 
 func TestOperatorOrNewHeaderSimple (t *testing.T) {
 	lhsheaders := []string{"h1", "lh"}
 	lhsData := [][]string{[]string{"a", "b"}}
-	lhs := constructTable(lhsheaders, lhsData)
+	lhs := ConstructTable(lhsheaders, lhsData)
 
 	rhsheaders := []string{"h1", "rh"}
 	rhsData := [][]string{[]string{"c", "d"}}
-	rhs := constructTable(rhsheaders, rhsData)
+	rhs := ConstructTable(rhsheaders, rhsData)
 
 	result := lhs.OperatorOr(rhs)
 
@@ -192,9 +192,9 @@ func TestOperatorOrNewHeaderSimple (t *testing.T) {
 	expectedData := [][]string{
 		[]string{"a", "b", ""}, 
 		[]string{"c", "", "d"}}
-	expected := constructTable(expectedHeaders, expectedData)
+	expected := ConstructTable(expectedHeaders, expectedData)
 
-	compareData(expected.Data, result.Data, true, t)
+	CompareData(expected.Data, result.Data, true, t)
 }
 
 func TestOperatorOrOperandsNotModified (t *testing.T) {
@@ -202,13 +202,13 @@ func TestOperatorOrOperandsNotModified (t *testing.T) {
 	lhsData := [][]string{
 		[]string{"a", "b"},
 		[]string{"c", "d"}}
-	lhs := constructTable(lhsHeaders, lhsData)
+	lhs := ConstructTable(lhsHeaders, lhsData)
 
 	rhsHeaders := []string{"h", "r"}
 	rhsData := [][]string{
 		[]string{"e", "f"},
 		[]string{"g", "h"}}
-	rhs := constructTable(rhsHeaders, rhsData)
+	rhs := ConstructTable(rhsHeaders, rhsData)
 
 	lhs.OperatorOr(rhs)
 
@@ -220,44 +220,8 @@ func TestOperatorOrOperandsNotModified (t *testing.T) {
 	}
 
 	t.Logf("lhs:")
-	compareData(constructTable(lhsHeaders, lhsData).Data, lhs.Data, true, t)
+	CompareData(ConstructTable(lhsHeaders, lhsData).Data, lhs.Data, true, t)
 
 	t.Logf("\nrhs:")
-	compareData(constructTable(rhsHeaders, rhsData).Data, rhs.Data, true, t)
-}
-
-//helpers
-func constructTable(headers []string, data [][]string) *Csv {
-	out := NewCsv()
-	out.Headers = headers
-
-	for _, row := range data {
-		newRow := make(map[string]string)
-		for index,  field := range row {
-			newRow[headers[index]] = field
-		}
-		out.Data = append(out.Data, newRow)
-	}
-
-	return out
-}
-
-func compareData(expected []map[string]string, actual []map[string]string, checkAllWidths bool, t *testing.T) {
-	if len(expected) != len(actual) {
-		t.Fatalf("expected %d rows, but got %d", len(expected), len(actual))
-	}
-
-	var checkWidth = true
-	for index := range expected {
-		if checkWidth && len(expected[index]) != len(actual[index]) {
-			t.Errorf("expected row %d to have %d fields, but found %d", index, len(expected[index]), len(actual[index]))
-			checkWidth = checkAllWidths
-		}
-
-		for k, _ := range expected[index] {
-			if expected[index][k] != actual[index][k] {
-				t.Errorf("expected row %d, field %s to have value %s, but found %s", index, k, expected[index][k], actual[index][k])
-			}
-		}
-	} 
+	CompareData(ConstructTable(rhsHeaders, rhsData).Data, rhs.Data, true, t)
 }
