@@ -70,7 +70,7 @@ func expandBinExpr(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 
 	//if theres only one child just return it (effective bypass to Expr2)
 	if len(children) == 1 {
-		return children[1], "", tokens
+		return children[0], "", tokens
 	}
 
 	//otherwise construct the tree

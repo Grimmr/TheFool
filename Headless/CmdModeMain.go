@@ -1,8 +1,9 @@
 package Headless
 
 import (
-	"os"
+	"fmt"
 	"github.com/Grimmr/TheFool/Parser"
+	"github.com/Grimmr/TheFool/Interp"
 )
 
 func RunCmdMode(args []string) {
@@ -12,5 +13,6 @@ func RunCmdMode(args []string) {
 		expr += element + " "
 	}
 
-	os.Stdout.WriteString(Parser.WalkParseTree(Parser.ParseProgramme(Parser.LexProgramme(expr))) + "\n")
+	result := Interp.InterpProgramme(Parser.ParseProgramme(Parser.LexProgramme(expr)), nil)
+	fmt.Print(result.ToString())
 }
