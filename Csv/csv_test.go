@@ -197,6 +197,35 @@ func TestOperatorOrNewHeaderSimple (t *testing.T) {
 	compareData(expected.Data, result.Data, true, t)
 }
 
+func TestOperatorOrOperandsNotModified (t *testing.T) {
+	lhsHeaders := []string{"h", "l"}
+	lhsData := [][]string{
+		[]string{"a", "b"},
+		[]string{"c", "d"}}
+	lhs := constructTable(lhsHeaders, lhsData)
+
+	rhsHeaders := []string{"h", "r"}
+	rhsData := [][]string{
+		[]string{"e", "f"},
+		[]string{"g", "h"}}
+	rhs := constructTable(rhsHeaders, rhsData)
+
+	lhs.OperatorOr(rhs)
+
+	if !reflect.DeepEqual(lhsHeaders,lhs.Headers) {
+		t.Errorf("lhs headers: expected %v, got %v", lhsHeaders, lhs.Headers)
+	}
+	if !reflect.DeepEqual(rhsHeaders,rhs.Headers) {
+		t.Errorf("rhs headers: expected %v, got %v", rhsHeaders, rhs.Headers)
+	}
+
+	t.Logf("lhs:")
+	compareData(constructTable(lhsHeaders, lhsData).Data, lhs.Data, true, t)
+
+	t.Logf("\nrhs:")
+	compareData(constructTable(rhsHeaders, rhsData).Data, rhs.Data, true, t)
+}
+
 //helpers
 func constructTable(headers []string, data [][]string) *Csv {
 	out := NewCsv()
