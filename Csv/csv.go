@@ -103,6 +103,31 @@ func (this *Csv) parseLine () ([]string, bool) {
 	return out, len(out) != 0 
 } 
 
+func (this *Csv) ToString() string {
+	var out string
+	//headers
+	for index, field := range this.Headers {
+		if index != 0 {
+			out += ", "
+		}
+		out += field
+	}
+	out += "\n"
+	//data
+	for _, row := range this.Data {
+		first := true
+		for _, value := range row {
+			if !first {
+				out += ", "
+			}
+			first = false
+			out += value
+		}
+		out += "\n" 
+	}
+	return out
+}
+
 //this assumes the header isn't a dupe
 func (this *Csv) insertHeader(header string) {
 	//add the header

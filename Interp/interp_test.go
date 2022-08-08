@@ -7,7 +7,7 @@ import (
 	"github.com/Grimmr/TheFool/Csv"
 )
 
-func TestsInterpName (t *testing.T) {
+func TestInterpName (t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv"))
 
 	result := InterpProgramme(programme, nil)

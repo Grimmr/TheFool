@@ -197,6 +197,20 @@ func TestOperatorOrNewHeaderSimple (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
+func TestToString (t *testing.T) {
+	Headers := []string{"h", "l"}
+	Data := [][]string{
+		[]string{"a", "b"},
+		[]string{"c", "d"}}
+	table := ConstructTable(Headers, Data)
+
+	actual := table.ToString()
+	expected := "h, l\na, b\nc, d\n"
+	if actual != expected {
+		t.Errorf("\nexpected\n%s\ngot\n%s", expected, actual)
+	}
+}
+
 func TestOperatorOrOperandsNotModified (t *testing.T) {
 	lhsHeaders := []string{"h", "l"}
 	lhsData := [][]string{
@@ -225,3 +239,4 @@ func TestOperatorOrOperandsNotModified (t *testing.T) {
 	t.Logf("\nrhs:")
 	CompareData(ConstructTable(rhsHeaders, rhsData).Data, rhs.Data, true, t)
 }
+
