@@ -5,8 +5,8 @@ import (
 )
 
 type ParseTreeNode struct {
-	token lexToken
-	children []*ParseTreeNode
+	Token lexToken
+	Children []*ParseTreeNode
 }
 
 func ParseProgramme(tokens []lexToken) *ParseTreeNode {
@@ -32,11 +32,11 @@ func expandExpr2(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 }
 
 func expandName(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
-	if !expect(tokens, []lexTokenType{lexTokenType_name}) {
+	if !expect(tokens, []lexTokenType{LexTokenType_name}) {
 		return nil, "expected table name but got " + topLiteral(tokens), tokens
 	}
 
-	return &ParseTreeNode{token: tokens[0]}, "", tokens[1:]
+	return &ParseTreeNode{Token: tokens[0]}, "", tokens[1:]
 }
 
 func expandBinExpr(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
@@ -53,7 +53,7 @@ func expandBinExpr(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 	//now look for (op child)+
 	for true {
 		//consume operator
-		if !expect(tokens, []lexTokenType{lexTokenType_and, lexTokenType_or}) {
+		if !expect(tokens, []lexTokenType{LexTokenType_and, LexTokenType_or}) {
 			break
 		}
 		operators = append(operators, tokens[0])
@@ -75,14 +75,14 @@ func expandBinExpr(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 
 	//otherwise construct the tree
 	var out *ParseTreeNode = new(ParseTreeNode)
-	out.token = operators[0]
-	out.children = append(out.children, children[0])
-	out.children = append(out.children, children[1])
+	out.Token = operators[0]
+	out.Children = append(out.Children, children[0])
+	out.Children = append(out.Children, children[1])
 	for i := range operators[1:] {
 		var holder *ParseTreeNode = new(ParseTreeNode)
-		holder.token = operators[i+1]
-		holder.children = append(holder.children, out)
-		holder.children = append(holder.children, children[2+i])
+		holder.Token = operators[i+1]
+		holder.Children = append(holder.Children, out)
+		holder.Children = append(holder.Children, children[2+i])
 		out = holder
 	}
 
@@ -92,8 +92,8 @@ func expandBinExpr(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 }
 
 func WalkParseTree(node *ParseTreeNode) string {
-	out := "(" + node.token.literal 
-	for _, element := range node.children {
+	out := "(" + node.Token.Literal 
+	for _, element := range node.Children {
 		out += " " + WalkParseTree(element)
 	}
 	out += ")"
@@ -103,7 +103,7 @@ func WalkParseTree(node *ParseTreeNode) string {
 func expect(tokens []lexToken, targets []lexTokenType) bool {
 	if len(tokens) > 0 {
 		for _, element := range targets {
-			if element == tokens[0].tokenType {
+			if element == tokens[0].TokenType {
 				return true
 			}
 		}
@@ -114,7 +114,7 @@ func expect(tokens []lexToken, targets []lexTokenType) bool {
 
 func topLiteral(tokens []lexToken) string {
 	if len(tokens) > 0 {
-		return tokens[0].literal
+		return tokens[0].Literal
 	} else {
 		return "nothing"
 	}

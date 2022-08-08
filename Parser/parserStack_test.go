@@ -9,7 +9,7 @@ func TestLexProgrammeKeywords(t *testing.T) {
 	//should include one of every token
 	programme := "and or a.txt"
 	result := LexProgramme(programme)
-	expected := []lexToken{lexToken{"and", lexTokenType_and}, lexToken{"or", lexTokenType_or}, lexToken{"a.txt", lexTokenType_name}}
+	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}}
 
 	t.Logf("Lex returned %v", result)
 
@@ -26,7 +26,7 @@ func TestLexProgrammeKeywords(t *testing.T) {
 
 //WalkParseTree tests
 func TestWalkParseTree(t *testing.T) {
-	programme := &ParseTreeNode{lexToken{"and", lexTokenType_and}, []*ParseTreeNode{&ParseTreeNode{lexToken{"or", lexTokenType_or}, []*ParseTreeNode{&ParseTreeNode{lexToken{"a", lexTokenType_name}, nil}, &ParseTreeNode{lexToken{"b", lexTokenType_name}, nil}}}, &ParseTreeNode{lexToken{"c", lexTokenType_name}, nil}}}
+	programme := &ParseTreeNode{lexToken{"and", LexTokenType_and}, []*ParseTreeNode{&ParseTreeNode{lexToken{"or", LexTokenType_or}, []*ParseTreeNode{&ParseTreeNode{lexToken{"a", LexTokenType_name}, nil}, &ParseTreeNode{lexToken{"b", LexTokenType_name}, nil}}}, &ParseTreeNode{lexToken{"c", LexTokenType_name}, nil}}}
 	result := WalkParseTree(programme)
 	expected := "(and (or (a) (b)) (c))"
 	if result != expected {
@@ -37,7 +37,7 @@ func TestWalkParseTree(t *testing.T) {
 //parser only tests ()
 //a simple one level test of and
 func TestParseOnly(t *testing.T) {
-	programme := []lexToken{lexToken{"a", lexTokenType_name}, lexToken{"and", lexTokenType_and}, lexToken{"b", lexTokenType_name}}
+	programme := []lexToken{lexToken{"a", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"b", LexTokenType_name}}
 	result := WalkParseTree(ParseProgramme(programme)) 
 	expected := "(and (a) (b))"
 	if result != expected {
@@ -86,16 +86,16 @@ func TestParseProgrammeAndOr(t *testing.T) {
 
 //helpers
 func compareTrees(a *ParseTreeNode, b *ParseTreeNode) bool {
-	if a.token != b.token {
+	if a.Token != b.Token {
 		return false
 	}
 
-	if len(a.children) != len(b.children){
+	if len(a.Children) != len(b.Children){
 		return false
 	}
 
-	for index := range a.children {
-		if !compareTrees(a.children[index], b.children[index]) {
+	for index := range a.Children {
+		if !compareTrees(a.Children[index], b.Children[index]) {
 			return false
 		}
 	} 
