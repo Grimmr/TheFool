@@ -17,6 +17,10 @@ func interpNode(node *Parser.ParseTreeNode, buffers *BufferTable) *Csv.Csv {
 	switch node.Token.TokenType {
 	case Parser.LexTokenType_name: 
 		return buffers.GetOrLoad(node.Token.Literal)
+	case Parser.LexTokenType_or:
+		lhs := interpNode(node.Children[0], buffers)
+		rhs := interpNode(node.Children[1], buffers)
+		return lhs.OperatorOr(rhs)
 	} 
 
 	return nil
