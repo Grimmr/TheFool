@@ -1,7 +1,7 @@
 package Parser
 
 import (
-	"os"
+	"errors"
 )
 
 type ParseTreeNode struct {
@@ -12,7 +12,7 @@ type ParseTreeNode struct {
 func ParseProgramme(tokens []lexToken) *ParseTreeNode {
 	out, err, _ := expandExpr1(tokens)
 	if out == nil {
-		os.Stderr.WriteString(err + "\n")
+		panic(errors.New(err + "\n"))
 	}
 	return out
 }

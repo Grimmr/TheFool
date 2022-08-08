@@ -4,6 +4,8 @@ import(
 	"io/ioutil"
 	"strings"
 	"testing"
+	"os"
+	"errors"
 )
 
 type Csv struct {
@@ -23,12 +25,6 @@ func NewCsv () *Csv {
 	return &out
 }
 
-func checkErr(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
 func (this *Csv) empty () {
 	this.Headers = []string{}
 	this.Data = []map[string]string{}
@@ -42,7 +38,11 @@ func (this *Csv) Read (path string) bool {
 
 	//attempt to read file into a buffer
 	bytes, err := ioutil.ReadFile(path)
-	checkErr(err)
+	
+	if os.IsNotExist(err)  {
+		panic(errors.New("file/path not found " + path))
+	}
+
 	this.Raw = string(bytes)
 
 
@@ -116,12 +116,12 @@ func (this *Csv) ToString() string {
 	//data
 	for _, row := range this.Data {
 		first := true
-		for _, value := range row {
+		for _, field := range this.Headers {
 			if !first {
 				out += ", "
 			}
 			first = false
-			out += value
+			out += row[field]
 		}
 		out += "\n" 
 	}
