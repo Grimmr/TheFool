@@ -240,3 +240,40 @@ func TestOperatorOrOperandsNotModified (t *testing.T) {
 	CompareData(ConstructTable(rhsHeaders, rhsData).Data, rhs.Data, true, t)
 }
 
+func TestOperatorAndSimple (t *testing.T) {
+	headers := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}, []string{"b"}}
+	lhs := ConstructTable(headers, lhsData)
+
+	rhsData := [][]string{[]string{"b"}}
+	rhs := ConstructTable(headers, rhsData)
+
+	result := lhs.OperatorAnd(rhs)
+
+	expectedData := [][]string{[]string{"b"}}
+	expected := ConstructTable(headers, expectedData)
+
+	CompareData(expected.Data, result.Data, true, t)
+}
+
+func TestOperatorAndNewHeaderSimple (t *testing.T) {
+	lhsheaders := []string{"h1", "lh"}
+	lhsData := [][]string{[]string{"a", "b"}}
+	lhs := ConstructTable(lhsheaders, lhsData)
+
+	rhsheaders := []string{"h1", "rh"}
+	rhsData := [][]string{[]string{"a", "d"}}
+	rhs := ConstructTable(rhsheaders, rhsData)
+
+	result := lhs.OperatorAnd(rhs)
+
+	expectedHeaders := []string{"h1"}
+	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a"}} 
+	expected := ConstructTable(expectedHeaders, expectedData)
+
+	CompareData(expected.Data, result.Data, true, t)
+}

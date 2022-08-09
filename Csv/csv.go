@@ -139,7 +139,7 @@ func (this *Csv) insertHeader(header string) {
 	}
 }
 
-func (this *Csv) insertRow(extraHeaders []string, row map[string]string) {
+func (this *Csv) insertRow(row map[string]string) {
 	//create new row object
 	newRow := make(map[string]string)
 	for k, v := range row {
@@ -147,8 +147,24 @@ func (this *Csv) insertRow(extraHeaders []string, row map[string]string) {
 	} 
 
 	//add new headers
-	for _, header := range extraHeaders {
-		newRow[header] = ""
+	for _, header := range this.Headers {
+		if _, ok := newRow[header]; !ok {
+			newRow[header] = ""
+		}
+	}
+
+	//remove unneeded headers
+	for k, _ := range newRow {
+		remove := true
+		for _, header := range this.Headers {
+			if k == header {
+				remove = false
+				break
+			}
+		}
+		if remove {
+			delete(newRow, k)
+		}
 	}
 
 	//add the row
@@ -191,32 +207,67 @@ func (this *Csv) OperatorOr(rhs *Csv) *Csv {
 
 	//copy lhs into out
 	for _, element := range this.Data {
-		out.insertRow(rhsHeaders, element)
+		out.insertRow(element)
 	}
 
 	//copy only needed rhs rows
 	for _, targetRow := range rhs.Data {
 		add := true
 		for _, checkRow := range this.Data {
-			if matchRow(targetRow, checkRow) {
+			if matchRow(out.Headers, targetRow, checkRow) {
 				add = false
 				break
 			}
 		}
 		if add {
-			out.insertRow(lhsHeaders, targetRow)
+			out.insertRow(targetRow)
 		}
 	}
 
 	return out 
 }
 
-func matchRow(lhs map[string]string, rhs map[string]string) bool {
+func (this *Csv) OperatorAnd(rhs *Csv) *Csv {
+	out := NewCsv()
+
+	//select headers
+	for _, targetHeader := range this.Headers {
+		for _, checkHeader := range rhs.Headers {
+			if targetHeader == checkHeader {
+				out.insertHeader(targetHeader)
+				break
+			}
+		} 
+	}
+
+	//select rows
+	for _, targetRow := range this.Data {
+		for _, checkRow := range rhs.Data {
+			if matchRow(out.Headers, targetRow, checkRow) {
+				out.insertRow(targetRow)
+			}
+		}
+	} 
+
+	return out
+}
+
+func matchRow(headers []string, lhs map[string]string, rhs map[string]string) bool {
 	if len(lhs) != len(rhs) {
 		return false
 	}
 
 	for k, _ := range lhs {
+		skip := true
+		for _, header := range headers {
+			if k == header {
+				skip = false
+			}
+		}
+		if skip {
+			continue
+		}
+
 		if _, ok := rhs[k]; !ok {
 			return false
 		}
