@@ -11,6 +11,7 @@ import(
 type Csv struct {
 	Headers []string
 	Data []map[string]string
+	Index map[int]int
 	Raw string
 	RawPos int
 	EndRow byte
