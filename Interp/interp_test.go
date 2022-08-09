@@ -41,3 +41,18 @@ func TestInterpOr (t *testing.T) {
 	
 	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
+
+func TestInterpAnd (t *testing.T) {
+	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/andData.csv and test_data/andData2.csv"))
+
+	result := InterpProgramme(programme, nil)
+
+	expectedHeaders := []string{"h1", "h2", "h3"}
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
+		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a","b","c"}}
+	
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
+}
