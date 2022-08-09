@@ -277,3 +277,27 @@ func TestOperatorAndNewHeaderSimple (t *testing.T) {
 
 	CompareData(expected.Data, result.Data, true, t)
 }
+
+func TestGenerateIndex (t *testing.T) {
+	headers := []string{"1", "2", "3"}
+	data := [][]string{
+		[]string{"a", "b", "a"},
+		[]string{"b", "b", "b"},
+		[]string{"a", "a", "c"},
+	  	[]string{"c", "c", "c"}}
+
+	table := ConstructTable(headers, data)
+	table.generateIndex()
+
+	expectedIndex := []int{2, 0, 1, 3}
+	
+	expectedLen := len(expectedIndex)
+	actualLen := len(table.Index)
+	if expectedLen != actualLen {
+		t.Fatalf("expected Index length %d, got %d", expectedLen, actualLen)
+	}
+
+	if !reflect.DeepEqual(expectedIndex, table.Index) {
+		t.Errorf("expected %d, got %d", expectedIndex, table.Index)
+	}
+}

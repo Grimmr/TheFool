@@ -11,6 +11,7 @@ import(
 type Csv struct {
 	Headers []string
 	Data []map[string]string
+	Index []int
 	Raw string
 	RawPos int
 	EndRow byte
@@ -71,6 +72,8 @@ func (this *Csv) Read (path string) bool {
 		this.Data = append(this.Data, row)
 	}
 
+	this.generateIndex()
+
 	return true
 }
 
@@ -102,6 +105,40 @@ func (this *Csv) parseLine () ([]string, bool) {
 	}
 	return out, len(out) != 0 
 } 
+
+func rowLessThen(headerOrder []string, lhs map[string]string, rhs map[string]string) bool {
+	for _, header := range headerOrder {
+		if lhs[header] < rhs[header] {
+			return true
+		} else if lhs[header] > rhs[header] {
+			return false
+		}
+	}
+
+	return false
+}
+
+func (this *Csv) generateIndex() {
+	//make an initial index
+	dumbIndex := make([]int, len(this.Data))
+	for i := 0; i < len(dumbIndex); i++ {
+		dumbIndex[i] = i
+	}
+	
+	//we're going to use selection sort which in n^2. sooner or later this should be improved
+	for _ = range this.Data {
+		selected := 0
+		for compareIndex := range dumbIndex {
+			if rowLessThen(this.Headers, this.Data[dumbIndex[compareIndex]], this.Data[dumbIndex[selected]]) {
+				selected = compareIndex
+			}
+		}
+		this.Index = append(this.Index, dumbIndex[selected])
+
+		dumbIndex[selected] = dumbIndex[len(dumbIndex)-1]
+		dumbIndex = dumbIndex[:len(dumbIndex)-1]
+	} 
+}
 
 func (this *Csv) ToString() string {
 	var out string
