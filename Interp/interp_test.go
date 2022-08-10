@@ -35,9 +35,9 @@ func TestInterpOr (t *testing.T) {
 	}
 
 	expectedData := [][]string{
+		[]string{"a", "", "", "b"},
 		[]string{"a","b","c", ""},
-		[]string{"d","e","f", ""},
-		[]string{"a", "", "", "b"}}
+		[]string{"d","e","f", ""}}
 	
 	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }

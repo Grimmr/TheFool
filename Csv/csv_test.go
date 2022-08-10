@@ -278,6 +278,35 @@ func TestOperatorAndNewHeaderSimple (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
+func TestRowLessThen (t *testing.T) {
+	headers := []string{"1", "2", "3"}
+	data := [][]string{
+		[]string{"a", "b", "a"},
+		[]string{"b", "b", "b"},
+		[]string{"a", "a", "c"},
+	  	[]string{"c", "c", "c"}}
+
+	table := ConstructTable(headers, data)
+
+	expected := true 
+	actual := rowLessThen(headers, table.Data[0], table.Data[3])
+	if expected != actual {
+		t.Errorf("test 1: expected %t, got %t", expected, actual)
+	}
+
+	expected = false 
+	actual = rowLessThen(headers, table.Data[0], table.Data[0])
+	if expected != actual {
+		t.Errorf("test 2: expected %t, got %t", expected, actual)
+	}
+
+	expected = false 
+	actual = rowLessThen(headers, table.Data[3], table.Data[0])
+	if expected != actual {
+		t.Errorf("test 3: expected %t, got %t", expected, actual)
+	}
+}
+
 func TestGenerateIndex (t *testing.T) {
 	headers := []string{"1", "2", "3"}
 	data := [][]string{
@@ -299,5 +328,37 @@ func TestGenerateIndex (t *testing.T) {
 
 	if !reflect.DeepEqual(expectedIndex, table.Index) {
 		t.Errorf("expected %d, got %d", expectedIndex, table.Index)
+	}
+}
+
+func TestFitHeaders (t *testing.T) {
+	headers := []string{"a", "b"}
+	row := map[string]string{"a":"a", "c":"c"}
+
+	expected := map[string]string{"a":"a", "b":""}
+	actual := fitHeaders(headers, row)
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Errorf("expected %v, got %v", expected, actual)
+	}
+}
+
+func TestMatchRow (t *testing.T) {
+	headers := []string{"a", "b"}
+	data := [][]string{
+		[]string{"a", "b"},
+		[]string{"b", "b"}}
+	table := ConstructTable(headers, data)
+
+	expected := true
+	actual := matchRow(headers, table.Data[0], table.Data[0])
+	if expected != actual {
+		t.Errorf("test 1: expected %t, got %t", expected, actual)
+	}
+
+	expected = false
+	actual = matchRow(headers, table.Data[0], table.Data[1])
+	if expected != actual {
+		t.Errorf("test 2: expected %t, got %t", expected, actual)
 	}
 }
