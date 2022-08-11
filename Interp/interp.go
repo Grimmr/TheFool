@@ -25,6 +25,10 @@ func interpNode(node *Parser.ParseTreeNode, buffers *BufferTable) *Csv.Csv {
 		lhs := interpNode(node.Children[0], buffers)
 		rhs := interpNode(node.Children[1], buffers)
 		return lhs.OperatorAnd(rhs)
+	case Parser.LexTokenType_less:
+		lhs := interpNode(node.Children[0], buffers)
+		rhs := interpNode(node.Children[1], buffers)
+		return lhs.OperatorLess(rhs)
 	} 
 
 	return nil

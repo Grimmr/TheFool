@@ -278,6 +278,28 @@ func TestOperatorAndNewHeaderSimple (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
+func TestOperatorLessSimple (t *testing.T) {
+	lhsheaders := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}, []string{"b"}}
+	lhs := ConstructTable(lhsheaders, lhsData)
+
+	rhsheaders := []string{"h1"}
+	rhsData := [][]string{[]string{"b"}}
+	rhs := ConstructTable(rhsheaders, rhsData)
+
+	result := lhs.OperatorLess(rhs)
+
+	expectedHeaders := []string{"h1"}
+	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a"}} 
+	expected := ConstructTable(expectedHeaders, expectedData)
+
+	CompareData(expected.Data, result.Data, true, t)
+}
+
 func TestRowLessThen (t *testing.T) {
 	headers := []string{"1", "2", "3"}
 	data := [][]string{
