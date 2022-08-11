@@ -7,9 +7,9 @@ import (
 //lexer only tests
 func TestLexProgrammeKeywords(t *testing.T) {
 	//should include one of every token
-	programme := "and or a.txt"
+	programme := "and or a.txt less"
 	result := LexProgramme(programme)
-	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}}
+	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}}
 
 	t.Logf("Lex returned %v", result)
 
@@ -74,6 +74,25 @@ func TestParseAndOr(t *testing.T) {
 	}
 }
 
+func TestParseLess(t *testing.T) {
+	programme := "a less b"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(less (a) (b))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseLessTighterThenAndOr(t *testing.T) {
+	programme := "a and b less c"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(and (a) (less (b) (c)))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+
 //example programmes
 func TestParseProgrammeAndOr(t *testing.T) {
 	programme := "dogs1.csv and dogs2.csv or cats.csv"
@@ -83,6 +102,7 @@ func TestParseProgrammeAndOr(t *testing.T) {
 		t.Fatalf("expected %s, got %s", expected, result)
 	}
 }
+
 
 //helpers
 func compareTrees(a *ParseTreeNode, b *ParseTreeNode) bool {

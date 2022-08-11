@@ -11,6 +11,7 @@ const (
 	LexTokenType_name = iota
 	LexTokenType_or
 	LexTokenType_and
+	LexTokenType_less
 )
 
 func LexProgramme(prog string) []lexToken {
@@ -29,6 +30,8 @@ func LexProgramme(prog string) []lexToken {
 				out = append(out, lexToken{buffer, LexTokenType_and})
 			case "or": 
 				out = append(out, lexToken{buffer, LexTokenType_or})
+			case "less":
+				out = append(out, lexToken{buffer, LexTokenType_less})
 			default:
 				out = append(out, lexToken{buffer, LexTokenType_name})
 			}
