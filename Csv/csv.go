@@ -309,11 +309,36 @@ func (this *Csv) OperatorAnd(rhs *Csv) *Csv {
 	}
 
 	//select rows
-	for _, targetRow := range this.Data {
-		for _, checkRow := range rhs.Data {
-			if matchRow(out.Headers, targetRow, checkRow) {
-				out.insertRow(targetRow)
+	lhsPos := 0
+	rhsPos := 0
+	for lhsPos < len(this.Data) && rhsPos < len(rhs.Data) {
+		lhsRow := fitHeaders(out.Headers, this.Data[this.Index[lhsPos]])
+		rhsRow := fitHeaders(out.Headers, rhs.Data[rhs.Index[rhsPos]])
+		var addedRow map[string]string 
+
+		if matchRow(out.Headers, lhsRow, rhsRow){
+			out.insertRow(lhsRow)
+			addedRow = lhsRow
+
+			for lhsPos < len(this.Data) {
+				if matchRow(out.Headers, fitHeaders(out.Headers, this.Data[this.Index[lhsPos]]), addedRow) {
+					lhsPos++
+				} else {
+					break
+				}
 			}
+
+			for rhsPos < len(rhs.Data) {
+				if matchRow(out.Headers, fitHeaders(out.Headers, rhs.Data[rhs.Index[rhsPos]]), addedRow) {
+					rhsPos++
+				} else {
+					break
+				}
+			}
+		} else if rowLessThen(out.Headers, lhsRow, rhsRow) {
+			lhsPos++
+		} else if rowLessThen(out.Headers, rhsRow, lhsRow) {
+			rhsPos++
 		}
 	} 
 
