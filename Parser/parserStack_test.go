@@ -9,7 +9,7 @@ func TestLexProgrammeKeywords(t *testing.T) {
 	//should include one of every token
 	programme := "and or a.txt less()"
 	result := LexProgramme(programme)
-	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"(", LexTokenType_lParen}, lexToken{")", LexTokenType_rParen}}
+	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"'('", LexTokenType_lParen}, lexToken{"')'", LexTokenType_rParen}}
 
 	t.Logf("Lex returned %v", result)
 
@@ -87,6 +87,24 @@ func TestParseLessTighterThenAndOr(t *testing.T) {
 	programme := "a and b less c"
 	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
 	expected := "(and (a) (less (b) (c)))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseParen(t *testing.T) {
+	programme := "(a and b)"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "('(' (and (a) (b)))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseBypassesOrder(t *testing.T) {
+	programme := "(a and b) less c"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(less ('(' (and (a) (b))) (c))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
 	}

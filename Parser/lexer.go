@@ -56,9 +56,9 @@ func LexProgramme(prog string) []lexToken {
 
 		switch delayChar {
 		case '(':
-			out = append(out, lexToken{"(", LexTokenType_lParen})
+			out = append(out, lexToken{"'('", LexTokenType_lParen})
 		case ')':
-			out = append(out, lexToken{")", LexTokenType_rParen})
+			out = append(out, lexToken{"')'", LexTokenType_rParen})
 		}
 	}
 
