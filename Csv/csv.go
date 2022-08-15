@@ -6,6 +6,9 @@ import(
 	"testing"
 	"os"
 	"errors"
+	"math/rand"
+	"strconv"
+	"sort"
 	//"fmt"
 )
 
@@ -381,6 +384,41 @@ func (this *Csv) OperatorLess(rhs *Csv) *Csv {
 	for lhsPos < len(this.Data) {
 		out.insertRow(this.Data[this.Index[lhsPos]])
 		lhsPos++
+	}
+
+	return out
+}
+
+func (this *Csv) OperatorRandomSubset(rhs string, random *rand.Rand) *Csv {
+	out := NewCsv()
+
+	//select headers
+	for _, field := range this.Headers {
+		out.insertHeader(field)
+	}
+
+	//select data 
+	targetCount, _ := strconv.Atoi(rhs)
+	if targetCount < len(this.Data) {
+		targets := make([]int, 0)
+		options := make([]int, len(this.Data))
+		for i := range options {
+			options[i] = i
+		}
+		for i := 0; i < targetCount; i++ {
+			selected := random.Intn(len(options))
+			targets = append(targets, options[selected])
+			options[selected] = options[len(options)-1]
+			options = options[:len(options)-1]
+		}
+		sort.Ints(targets)
+		for _, row := range targets {
+			out.insertRow(this.Data[this.Index[row]])
+		} 
+	} else {
+		for i := range this.Index {
+			out.insertRow(this.Data[this.Index[i]])
+		}
 	}
 
 	return out

@@ -7,9 +7,9 @@ import (
 //lexer only tests
 func TestLexProgrammeKeywords(t *testing.T) {
 	//should include one of every token
-	programme := "and or a.txt less()"
+	programme := "and or a.txt less()%"
 	result := LexProgramme(programme)
-	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"'('", LexTokenType_lParen}, lexToken{"')'", LexTokenType_rParen}}
+	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"'('", LexTokenType_lParen}, lexToken{"')'", LexTokenType_rParen}, lexToken{"%", LexTokenType_percent}}
 
 	t.Logf("Lex returned %v", result)
 
@@ -92,6 +92,24 @@ func TestParseLessTighterThenAndOr(t *testing.T) {
 	}
 }
 
+func TestParseLessLess(t *testing.T) {
+	programme := "a less b less c"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(less (less (a) (b)) (c))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseManyLess(t *testing.T) {
+	programme := "a less b less c less d less e"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(less (less (less (less (a) (b)) (c)) (d)) (e))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
 func TestParseParen(t *testing.T) {
 	programme := "(a and b)"
 	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
@@ -110,6 +128,24 @@ func TestParseBypassesOrder(t *testing.T) {
 	}
 }
 
+func TestParseRandomSubset(t *testing.T) {
+	programme := "a%2"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(% (a) (2))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseRandomSubsetMultiple(t *testing.T) {
+	programme := "a%2%1"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(% (% (a) (2)) (1))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
 
 //example programmes
 func TestParseProgrammeAndOr(t *testing.T) {
@@ -119,6 +155,26 @@ func TestParseProgrammeAndOr(t *testing.T) {
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
 	}
+}
+
+//errors
+func TestRandomSubestRhsLetterError(t *testing.T) {
+	defer func () {
+		err, ok :=  recover().(error)
+		if !ok {
+			t.Fatalf("expected error but got nothing")
+		}
+		actual := err.Error()
+		expected := "expected number but found a"
+		if actual != expected {
+			t.Errorf("expected error '%s' but got '%s'", expected, actual)
+		}
+		
+	}()
+	
+	programme := "a%a"
+	WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	
 }
 
 

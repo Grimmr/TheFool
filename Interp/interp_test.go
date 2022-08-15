@@ -3,6 +3,7 @@ package Interp
 import (
 	"testing"
 	"reflect"
+	"math/rand"
 	"github.com/Grimmr/TheFool/Parser"
 	"github.com/Grimmr/TheFool/Csv"
 )
@@ -10,7 +11,7 @@ import (
 func TestInterpName (t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv"))
 
-	result := InterpProgramme(programme, nil)
+	result := InterpProgramme(programme, nil, nil)
 
 	expectedHeaders := []string{"h1", "h2", "h3"}
 	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
@@ -27,7 +28,7 @@ func TestInterpName (t *testing.T) {
 func TestInterpOr (t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv or test_data/simple2.csv"))
 
-	result := InterpProgramme(programme, nil)
+	result := InterpProgramme(programme, nil, nil)
 
 	expectedHeaders := []string{"h1", "h2", "h3", "h4"}
 	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
@@ -45,7 +46,7 @@ func TestInterpOr (t *testing.T) {
 func TestInterpAnd (t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/andData.csv and test_data/andData2.csv"))
 
-	result := InterpProgramme(programme, nil)
+	result := InterpProgramme(programme, nil, nil)
 
 	expectedHeaders := []string{"h1", "h2", "h3"}
 	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
@@ -60,7 +61,7 @@ func TestInterpAnd (t *testing.T) {
 func TestInterpLess (t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/andData.csv less test_data/andData2.csv"))
 
-	result := InterpProgramme(programme, nil)
+	result := InterpProgramme(programme, nil, nil)
 
 	expectedHeaders := []string{"h1", "h2", "h3"}
 	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
@@ -73,9 +74,9 @@ func TestInterpLess (t *testing.T) {
 }
 
 func TestInterpParen (t *testing.T) {
-	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv"))
+	programme := Parser.ParseProgramme(Parser.LexProgramme("(test_data/simple.csv)"))
 
-	result := InterpProgramme(programme, nil)
+	result := InterpProgramme(programme, nil, nil)
 
 	expectedHeaders := []string{"h1", "h2", "h3"}
 	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
@@ -83,6 +84,22 @@ func TestInterpParen (t *testing.T) {
 	}
 
 	expectedData := [][]string{[]string{"a","b","c"}, []string{"d","e","f"}}
+	
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t) 
+}
+
+func TestInterpRandomSubset (t *testing.T) {
+	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv%1"))
+
+	random := rand.NewSource(100)
+	result := InterpProgramme(programme, nil, &random)
+
+	expectedHeaders := []string{"h1", "h2", "h3"}
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
+		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"d","e","f"}}
 	
 	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t) 
 }

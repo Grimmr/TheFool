@@ -2,6 +2,7 @@ package Parser
 
 import (
 	"errors"
+	"strconv"
 )
 
 type ParseTreeNode struct {
@@ -12,7 +13,7 @@ type ParseTreeNode struct {
 func ParseProgramme(tokens []lexToken) *ParseTreeNode {
 	out, err, _ := expandExpr1(tokens)
 	if out == nil {
-		panic(errors.New(err + "\n"))
+		panic(errors.New(err))
 	}
 	return out
 }
@@ -26,6 +27,11 @@ func expandExpr2(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 }
 
 func expandExpr3(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
+	return expandRandomSubset(tokens)
+
+}
+
+func expandExpr4(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 	out, err, newtokens := expandName(tokens);
 	if out != nil {
 		return out, err, newtokens
@@ -34,6 +40,62 @@ func expandExpr3(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 	out, err, newtokens = expandParens(tokens);
 
 	return out, err, newtokens
+}
+
+func expandRandomSubset(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
+	var children []*ParseTreeNode
+	var operators []lexToken
+
+	//LHS
+	child, err, newTokens := expandExpr4(tokens)
+	if child == nil {
+		return nil, err, tokens
+	}
+	tokens = newTokens
+	children = append(children, child)
+	//now look for (op child)+
+	for true {
+		//consume operator
+		if !expect(tokens, []lexTokenType{LexTokenType_percent}) {
+			break
+		}
+		operators = append(operators, tokens[0])
+		tokens = tokens[1:]
+
+		//consume child
+		child, err, newTokens = expandName(tokens)
+		if child == nil {
+			return nil, err, tokens
+		}
+		//make sure child is a number
+		if _, e := strconv.Atoi(child.Token.Literal); e != nil {
+			return nil, "expected number but found " + topLiteral(tokens), tokens
+		}
+		tokens = newTokens
+		children = append(children, child)
+	}
+
+	//if theres only one child just return it (effective bypass to Expr4)
+	if len(children) == 1 {
+		return children[0], "", tokens
+	}
+
+	//otherwise construct the tree
+	var out *ParseTreeNode = new(ParseTreeNode)
+	out.Token = operators[0]
+	out.Children = append(out.Children, children[0])
+	out.Children = append(out.Children, children[1])
+	for i := range operators[1:] {
+		var holder *ParseTreeNode = new(ParseTreeNode)
+		holder.Token = operators[i+1]
+		holder.Children = append(holder.Children, out)
+		holder.Children = append(holder.Children, children[2+i])
+		out = holder
+	}
+
+
+	//return the generated node and consume tokens
+	return out, "", tokens
 }
 
 func expandParens(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
@@ -141,7 +203,7 @@ func expandLess(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 		tokens = tokens[1:]
 
 		//consume child
-		child, err, newTokens = expandExpr2(tokens)
+		child, err, newTokens = expandExpr3(tokens)
 		if child == nil {
 			return nil, err, tokens
 		}
