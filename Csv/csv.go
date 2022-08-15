@@ -389,7 +389,7 @@ func (this *Csv) OperatorLess(rhs *Csv) *Csv {
 	return out
 }
 
-func (this *Csv) operatorRandomSubset(rhs string, random *rand.Rand) *Csv {
+func (this *Csv) OperatorRandomSubset(rhs string, random *rand.Rand) *Csv {
 	out := NewCsv()
 
 	//select headers

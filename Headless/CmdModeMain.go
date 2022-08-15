@@ -13,6 +13,6 @@ func RunCmdMode(args []string) {
 		expr += element + " "
 	}
 
-	result := Interp.InterpProgramme(Parser.ParseProgramme(Parser.LexProgramme(expr)), nil)
+	result := Interp.InterpProgramme(Parser.ParseProgramme(Parser.LexProgramme(expr)), nil, nil)
 	fmt.Print(result.ToString())
 }

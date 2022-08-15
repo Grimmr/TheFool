@@ -310,7 +310,7 @@ func TestOperatorRandomSubsetSimple (t *testing.T) {
 	
 	rhs := "3"
 
-	result := lhs.operatorRandomSubset(rhs, random)
+	result := lhs.OperatorRandomSubset(rhs, random)
 
 	expectedHeaders := []string{"h1"}
 	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
@@ -332,7 +332,7 @@ func TestOperatorRandomSubsetRhsToBig (t *testing.T) {
 	
 	rhs := "8"
 
-	result := lhs.operatorRandomSubset(rhs, random)
+	result := lhs.OperatorRandomSubset(rhs, random)
 
 	expectedHeaders := []string{"h1"}
 	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
