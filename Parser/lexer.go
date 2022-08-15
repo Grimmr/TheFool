@@ -14,6 +14,7 @@ const (
 	LexTokenType_less
 	LexTokenType_lParen
 	LexTokenType_rParen
+	LexTokenType_percent
 )
 
 func LexProgramme(prog string) []lexToken {
@@ -30,6 +31,8 @@ func LexProgramme(prog string) []lexToken {
 			delayChar = '('
 		case ')':
 			delayChar = ')'
+		case '%':
+			delayChar = '%'
 		}
 
 		if delayChar != ' ' {
@@ -59,6 +62,8 @@ func LexProgramme(prog string) []lexToken {
 			out = append(out, lexToken{"'('", LexTokenType_lParen})
 		case ')':
 			out = append(out, lexToken{"')'", LexTokenType_rParen})
+		case '%':
+			out = append(out, lexToken{"%", LexTokenType_percent})
 		}
 	}
 
