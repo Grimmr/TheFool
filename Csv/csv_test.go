@@ -3,6 +3,7 @@ package Csv
 import (
 	"testing"
 	"reflect"
+	"math/rand"
 )
 
 func TestParseLine(t *testing.T) {
@@ -298,6 +299,50 @@ func TestOperatorLessSimple (t *testing.T) {
 	expected := ConstructTable(expectedHeaders, expectedData)
 
 	CompareData(expected.Data, result.Data, true, t)
+}
+
+func TestOperatorRandomSubsetSimple (t *testing.T) {
+	random := rand.New(rand.NewSource(8))
+	
+	lhsheaders := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}, []string{"b"}, []string{"c"}, []string{"d"}, []string{"e"}, []string{"f"}, []string{"g"}}
+	lhs := ConstructTable(lhsheaders, lhsData)
+	
+	rhs := "3"
+
+	result := lhs.operatorRandomSubset(rhs, random)
+
+	expectedHeaders := []string{"h1"}
+	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a"}, []string{"c"}, []string{"e"}} 
+	expectedTable := ConstructTable(expectedHeaders, expectedData)
+
+	CompareData(expectedTable.Data, result.Data, true, t)
+}
+
+func TestOperatorRandomSubsetRhsToBig (t *testing.T) {
+	random := rand.New(rand.NewSource(8))
+	
+	lhsheaders := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}, []string{"b"}, []string{"c"}}
+	lhs := ConstructTable(lhsheaders, lhsData)
+	
+	rhs := "8"
+
+	result := lhs.operatorRandomSubset(rhs, random)
+
+	expectedHeaders := []string{"h1"}
+	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a"}, []string{"b"}, []string{"c"}} 
+	expectedTable := ConstructTable(expectedHeaders, expectedData)
+
+	CompareData(expectedTable.Data, result.Data, true, t)
 }
 
 func TestRowLessThen (t *testing.T) {

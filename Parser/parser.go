@@ -2,6 +2,7 @@ package Parser
 
 import (
 	"errors"
+	"strconv"
 )
 
 type ParseTreeNode struct {
@@ -12,7 +13,7 @@ type ParseTreeNode struct {
 func ParseProgramme(tokens []lexToken) *ParseTreeNode {
 	out, err, _ := expandExpr1(tokens)
 	if out == nil {
-		panic(errors.New(err + "\n"))
+		panic(errors.New(err))
 	}
 	return out
 }
@@ -62,9 +63,13 @@ func expandRandomSubset(tokens []lexToken) (*ParseTreeNode, string, []lexToken) 
 		tokens = tokens[1:]
 
 		//consume child
-		child, err, newTokens = expandExpr4(tokens)
+		child, err, newTokens = expandName(tokens)
 		if child == nil {
 			return nil, err, tokens
+		}
+		//make sure child is a number
+		if _, e := strconv.Atoi(child.Token.Literal); e != nil {
+			return nil, "expected number but found " + topLiteral(tokens), tokens
 		}
 		tokens = newTokens
 		children = append(children, child)

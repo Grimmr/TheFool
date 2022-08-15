@@ -157,6 +157,26 @@ func TestParseProgrammeAndOr(t *testing.T) {
 	}
 }
 
+//errors
+func TestRandomSubestRhsLetterError(t *testing.T) {
+	defer func () {
+		err, ok :=  recover().(error)
+		if !ok {
+			t.Fatalf("expected error but got nothing")
+		}
+		actual := err.Error()
+		expected := "expected number but found a"
+		if actual != expected {
+			t.Errorf("expected error '%s' but got '%s'", expected, actual)
+		}
+		
+	}()
+	
+	programme := "a%a"
+	WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	
+}
+
 
 //helpers
 func compareTrees(a *ParseTreeNode, b *ParseTreeNode) bool {
