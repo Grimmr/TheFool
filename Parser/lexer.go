@@ -12,6 +12,8 @@ const (
 	LexTokenType_or
 	LexTokenType_and
 	LexTokenType_less
+	LexTokenType_lParen
+	LexTokenType_rParen
 )
 
 func LexProgramme(prog string) []lexToken {
@@ -22,6 +24,18 @@ func LexProgramme(prog string) []lexToken {
 	prog += " "
 
 	for _, letter := range prog {
+		var delayChar byte = ' '
+		switch letter {
+		case '(':
+			delayChar = '('
+		case ')':
+			delayChar = ')'
+		}
+
+		if delayChar != ' ' {
+			letter = ' '
+		}
+		
 		if(letter != ' ' && letter != '\n') {
 			buffer += string(letter)
 		} else {
@@ -33,9 +47,18 @@ func LexProgramme(prog string) []lexToken {
 			case "less":
 				out = append(out, lexToken{buffer, LexTokenType_less})
 			default:
-				out = append(out, lexToken{buffer, LexTokenType_name})
+				if len(buffer) != 0 {
+					out = append(out, lexToken{buffer, LexTokenType_name})
+				}
 			}
 			buffer = ""
+		}
+
+		switch delayChar {
+		case '(':
+			out = append(out, lexToken{"'('", LexTokenType_lParen})
+		case ')':
+			out = append(out, lexToken{"')'", LexTokenType_rParen})
 		}
 	}
 

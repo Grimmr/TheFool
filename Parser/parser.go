@@ -31,8 +31,33 @@ func expandExpr3(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 		return out, err, newtokens
 	}
 
-	//expand brackets here
+	out, err, newtokens = expandParens(tokens);
+
 	return out, err, newtokens
+}
+
+func expandParens(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
+	out := ParseTreeNode{}
+	
+	if !expect(tokens, []lexTokenType{LexTokenType_lParen}) {
+		return nil, "expected left paren but got " + topLiteral(tokens), tokens
+	}
+	out.Token = tokens[0]
+	tokens = tokens[1:]
+
+	child, err, newTokens := expandExpr1(tokens)
+	if child == nil {
+		return nil, err, tokens
+	}
+	out.Children = append(out.Children, child)
+	tokens = newTokens
+
+	if !expect(tokens, []lexTokenType{LexTokenType_rParen}) {
+		return nil, "expected right paren but got " + topLiteral(tokens), tokens
+	}
+	tokens = tokens[1:]
+
+	return &out, "", tokens
 }
 
 func expandName(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
