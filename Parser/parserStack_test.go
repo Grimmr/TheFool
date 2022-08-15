@@ -92,6 +92,24 @@ func TestParseLessTighterThenAndOr(t *testing.T) {
 	}
 }
 
+func TestParseLessLess(t *testing.T) {
+	programme := "a less b less c"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(less (less (a) (b)) (c))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseManyLess(t *testing.T) {
+	programme := "a less b less c less d less e"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(less (less (less (less (a) (b)) (c)) (d)) (e))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
 func TestParseParen(t *testing.T) {
 	programme := "(a and b)"
 	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
@@ -105,6 +123,24 @@ func TestParseBypassesOrder(t *testing.T) {
 	programme := "(a and b) less c"
 	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
 	expected := "(less ('(' (and (a) (b))) (c))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseRandomSubset(t *testing.T) {
+	programme := "a%2"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(% (a) (2))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseRandomSubsetMultiple(t *testing.T) {
+	programme := "a%2%1"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(% (% (a) (2)) (1))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
 	}
