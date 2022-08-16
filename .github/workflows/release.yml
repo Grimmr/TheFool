@@ -14,8 +14,7 @@ jobs:
         run: go build .
 
       - name: set tag name
-        run: echo "::set-output name=TAGNAME::@$(git show-ref HEAD --abbrev --hash)"
-        run: git show-ref HEAD --abbrev --hash
+        run: echo "::set-output name=TAGNAME::@$(git show-ref HEAD --abbrev --hash)"; git show-ref HEAD --abbrev --hash
         id: setTagName
       
       - uses: ncipollo/release-action@v1
