@@ -18,7 +18,7 @@ jobs:
         id: setTagName
       
       - name: debug
-        run:  git show-ref HEAD --abbrev --hash
+        run:  git show-ref HEAD --abbrev --hash 2&>1
       
       - uses: ncipollo/release-action@v1
         with:
