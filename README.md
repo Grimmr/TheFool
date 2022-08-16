@@ -1,9 +1,6 @@
 # TheFool
 TheFool is a simple command line csv combination program that can be used to merge, subtract and subset csv files. 
 ## Installation
-### Binary
-Binaries can be found on this repo's releases page
-
 ### From Source
 building TheFool only requires a working go tool chain and can be done by running
 ```
