@@ -1,0 +1,26 @@
+name: Release
+on:
+  push:
+    branches: [ "main "]
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: build-linux
+        run: go build .
+
+      - name: set tag name
+        run: echo "::set-output name=TAGNAME::@$(git show-ref HEAD --abbrev --hash)"
+        id: setTagName
+      
+      - uses: ncipollo/release-action@v1
+          with:
+            artifacts: "./TheFool"
+            commit: ${{ GITHUB_REF }}
+            tag: ${{ steps.setTagName.outputs.TAGNAME }}
