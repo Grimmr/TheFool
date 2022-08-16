@@ -14,7 +14,7 @@ jobs:
         run: go build .
 
       - name: set tag name
-        run: echo "::set-output name=TAGNAME::@$(git show-ref HEAD --abbrev --hash --head)"
+        run: echo "::set-output name=TAGNAME::@$(git show-ref HEAD --abbrev --hash --head)" && git tag @$(git show-ref HEAD --abbrev --hash --head) 
         id: setTagName
       
       - uses: ncipollo/release-action@v1
@@ -22,4 +22,4 @@ jobs:
           artifacts: "./TheFool"
           commit: ${{ env.GITHUB_REF }}
           tag: ${{ steps.setTagName.outputs.TAGNAME }}
-          body: "./ReleaseBody.md"
+          
