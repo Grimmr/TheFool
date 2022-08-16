@@ -22,3 +22,4 @@ jobs:
           artifacts: "./TheFool"
           commit: ${{ env.GITHUB_REF }}
           tag: ${{ steps.setTagName.outputs.TAGNAME }}
+          body: "./ReleaseBody.md"
