@@ -1,0 +1,26 @@
+name: Release
+on:
+  push:
+    branches: [ "main" ] 
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: build-linux
+        run: go build . && tar -czvf TheFoolLin.tar.gz TheFool
+
+      - name: build-windows
+        run: GOOS=windows go build . && tar -czvf TheFoolWin.tar.gz TheFool.exe
+      
+      - uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: "./TheFoolWin.tar.gz,./TheFoolLin.tar.gz"
+          commit: ${{ env.GITHUB_REF }}
+          tag: latest
