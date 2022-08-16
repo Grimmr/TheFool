@@ -12,13 +12,10 @@ jobs:
 
       - name: build-linux
         run: go build .
-
-      - name: set tag name
-        run: echo "::set-output name=TAGNAME::@$(git show-ref HEAD --abbrev --hash)"
-        id: setTagName
       
       - uses: ncipollo/release-action@v1
         with:
+          allowUpdates: true
           artifacts: "./TheFool"
           commit: ${{ env.GITHUB_REF }}
-          tag: ${{ steps.setTagName.outputs.TAGNAME }}
+          tag: latest
