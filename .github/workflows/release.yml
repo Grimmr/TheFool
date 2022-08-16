@@ -1,7 +1,5 @@
 name: Release
 on:
-  push:
-    branches: [ "main" ] 
   workflow_dispatch:
 
 jobs:
@@ -13,14 +11,15 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: build-linux
-        run: go build . && tar -czvf TheFoolLin.tar.gz TheFool
+        run: go build .
 
-      - name: build-windows
-        run: GOOS=windows go build . && tar -czvf TheFoolWin.tar.gz TheFool.exe
+      - name: set tag name
+        run: echo "::set-output name=TAGNAME::@$(git show-ref HEAD --abbrev --hash)"
+        run: git show-ref HEAD --abbrev --hash
+        id: setTagName
       
       - uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
-          artifacts: "./TheFoolWin.tar.gz,./TheFoolLin.tar.gz"
+          artifacts: "./TheFool"
           commit: ${{ env.GITHUB_REF }}
-          tag: latest
+          tag: ${{ steps.setTagName.outputs.TAGNAME }}
