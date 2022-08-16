@@ -20,5 +20,5 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "./TheFool"
-          commit: ${{ GITHUB_REF }}
+          commit: ${{ env.GITHUB_REF }}
           tag: ${{ steps.setTagName.outputs.TAGNAME }}
