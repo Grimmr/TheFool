@@ -13,11 +13,14 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: build-linux
-        run: go build .
+        run: go build . && tar -czvf TheFoolLin.tar.gz TheFool && rm TheFool
+
+      - name: build-windows
+        run: GOOS=windows go build . && tar -czvf TheFoolWin.tar.gz TheFool && rm TheFool
       
       - uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: "./TheFool"
+          artifacts: "./TheFoolWin.tar.gz,./TheFoolLin.tar.gz"
           commit: ${{ env.GITHUB_REF }}
           tag: latest
