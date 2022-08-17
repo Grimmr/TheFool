@@ -103,3 +103,19 @@ func TestInterpRandomSubset (t *testing.T) {
 	
 	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t) 
 }
+
+func TestInterpPlus (t *testing.T) {
+	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv+test_data/simple2.csv"))
+
+	random := rand.NewSource(100)
+	result := InterpProgramme(programme, nil, &random)
+
+	expectedHeaders := []string{"h1", "h2", "h3", "h4"}
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
+		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a", "", "", "b"}, []string{"a","b","c",""}, []string{"d","e","f",""}}
+	
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t) 
+}
