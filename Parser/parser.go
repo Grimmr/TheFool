@@ -144,7 +144,7 @@ func expandBinExpr(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 	//now look for (op child)+
 	for true {
 		//consume operator
-		if !expect(tokens, []lexTokenType{LexTokenType_and, LexTokenType_or}) {
+		if !expect(tokens, []lexTokenType{LexTokenType_and, LexTokenType_or, LexTokenType_plus}) {
 			break
 		}
 		operators = append(operators, tokens[0])

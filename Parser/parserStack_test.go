@@ -7,9 +7,9 @@ import (
 //lexer only tests
 func TestLexProgrammeKeywords(t *testing.T) {
 	//should include one of every token
-	programme := "and or a.txt less()%"
+	programme := "and or a.txt less()%+"
 	result := LexProgramme(programme)
-	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"'('", LexTokenType_lParen}, lexToken{"')'", LexTokenType_rParen}, lexToken{"%", LexTokenType_percent}}
+	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"'('", LexTokenType_lParen}, lexToken{"')'", LexTokenType_rParen}, lexToken{"%", LexTokenType_percent}, lexToken{"+", LexTokenType_plus}}
 
 	t.Logf("Lex returned %v", result)
 
@@ -141,6 +141,24 @@ func TestParseRandomSubsetMultiple(t *testing.T) {
 	programme := "a%2%1"
 	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
 	expected := "(% (% (a) (2)) (1))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParsePlusSimple(t *testing.T) {
+	programme := "a+b"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(+ (a) (b))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParsePlusBindsLikeAndOr(t *testing.T) {
+	programme := "a or b + c and d"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(and (+ (or (a) (b)) (c)) (d))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
 	}

@@ -15,6 +15,7 @@ const (
 	LexTokenType_lParen
 	LexTokenType_rParen
 	LexTokenType_percent
+	LexTokenType_plus
 )
 
 func LexProgramme(prog string) []lexToken {
@@ -25,21 +26,7 @@ func LexProgramme(prog string) []lexToken {
 	prog += " "
 
 	for _, letter := range prog {
-		var delayChar byte = ' '
-		switch letter {
-		case '(':
-			delayChar = '('
-		case ')':
-			delayChar = ')'
-		case '%':
-			delayChar = '%'
-		}
-
-		if delayChar != ' ' {
-			letter = ' '
-		}
-		
-		if(letter != ' ' && letter != '\n') {
+		if(isBufferChar(letter)) {
 			buffer += string(letter)
 		} else {
 			switch buffer {
@@ -57,15 +44,26 @@ func LexProgramme(prog string) []lexToken {
 			buffer = ""
 		}
 
-		switch delayChar {
+		switch letter {
 		case '(':
 			out = append(out, lexToken{"'('", LexTokenType_lParen})
 		case ')':
 			out = append(out, lexToken{"')'", LexTokenType_rParen})
 		case '%':
 			out = append(out, lexToken{"%", LexTokenType_percent})
+		case '+':
+			out = append(out, lexToken{"+", LexTokenType_plus})
 		}
 	}
 
 	return out
+}
+
+func isBufferChar(target rune) bool {
+	for _, char := range []rune{'(',')','%',' ','\n', '+'} {
+		if char == target {
+			return false
+		}
+	}
+	return true
 }
