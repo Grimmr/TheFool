@@ -19,40 +19,10 @@ TheFool dogs.csv or cats.csv
 TheFool animals.csv less (birds.csv or dogs.csv)
 ```
 ### Operators
-#### and
-selects only the rows where all fields common between both tables are the same. The resultant table will have only the common fields. Output will be made set like (ie: no duplicate rows).
-example:
-```
-|h1, h2|     |h1, h3|   |h1|
-|a,  b | and |a , e | = |a |
-|c,  d |     |f,  g |
-```
-
-### or
-combines both inputs into a single table by concatenating one onto the other. If the two input tables have a different set of field names the resultant table will have all fields from both inputs, any new fields added to a row will be left blank. Output will be made set like (ie: no duplicate rows).
-example:
-```
-|h1, h2|     |h1, h3|   |h1, h2, h3|
-|a,  b | or  |a , e | = |a,  b,    |
-                        |a,  ,   e |
-```
-
-### less
-removes entries in the right hand input from the left hand input. Only considers common fields.
-example:
-```
-|h1, h2|      |h1|   |h1, h2|
-|a,  b | less |a | = |c,  d |
-|c,  d |     
-```
-
-### % \<number\>
-creates a random subset of the input table with length \<number\>. all fields are preserved 
-
-### +
-like 'or', combines both inputs into a single table by concatenating one onto the other. If the two input tables have a different set of field names the resultant table will have all fields from both inputs, any new fields added to a row will be left blank. unlike or this does not remove duplicate rows from the output
-```
-|h1, h2|     |h2, h2|   |h1, h2|
-|a,  b | or  |a , b | = |a,  b |
-                        |a,  b |
-```
+ | Op | Usage | Header Semantics | Row Semantics | Row Multiplicity |
+ |----|-------|------------------|---------------|------------------|
+ | and | \<table\> and \<table\> | Only headers that exist in both input tables are selected | Only common fields are considered. Only rows that exist in both input tables are selected. | either 1 or 0, duplicate rows are discarded |
+ | or | \<table\> or \<table\> | All headers from both inputs tables are selected | All rows from both tables are selected. Any fields added to a row are left empty. | eitehr 1 or 0, duplicate rows are discarded |
+ | less | \<table\> less \<table\> | Only headers from the left hand input table are selected | Only common fields are considered. All rows that apear in the left hand input table less the rows that apear in the right hand table are slected. | Selected rows have the same multiplicity as in the left hand input table. |   
+ | % | \<table\> % \<number\> | All headers from the input table are selected | Rows are selected randomly up to either \<number\> or the length of the input table whichever is smaller. | Multiplicity of a row is no more then it's multiplicity in the input table. |
+ | + | \<table\> + \<number\> | All headers from both inputs tables are selected | All rows from both tables are selected. Any fields added to a row are left empty. | The multiplicity of a selected row is exactly the sum of its multiplities in the input tables |
