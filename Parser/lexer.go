@@ -15,6 +15,7 @@ const (
 	LexTokenType_lParen
 	LexTokenType_rParen
 	LexTokenType_percent
+	LexTokenType_plus
 )
 
 func LexProgramme(prog string) []lexToken {
@@ -50,6 +51,8 @@ func LexProgramme(prog string) []lexToken {
 			out = append(out, lexToken{"')'", LexTokenType_rParen})
 		case '%':
 			out = append(out, lexToken{"%", LexTokenType_percent})
+		case '+':
+			out = append(out, lexToken{"+", LexTokenType_plus})
 		}
 	}
 
@@ -57,7 +60,7 @@ func LexProgramme(prog string) []lexToken {
 }
 
 func isBufferChar(target rune) bool {
-	for _, char := range []rune{'(',')','%',' ','\n'} {
+	for _, char := range []rune{'(',')','%',' ','\n', '+'} {
 		if char == target {
 			return false
 		}
