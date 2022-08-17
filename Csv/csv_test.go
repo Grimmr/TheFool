@@ -345,6 +345,44 @@ func TestOperatorRandomSubsetRhsToBig (t *testing.T) {
 	CompareData(expectedTable.Data, result.Data, true, t)
 }
 
+func TestOperatorPlusSimple (t *testing.T) {
+	headers := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}, []string{"b"}}
+	lhs := ConstructTable(headers, lhsData)
+
+	rhsData := [][]string{[]string{"a"}}
+	rhs := ConstructTable(headers, rhsData)
+
+	result := lhs.OperatorPlus(rhs)
+
+	expectedData := [][]string{[]string{"a"}, []string{"a"}, []string{"b"}}
+	expected := ConstructTable(headers, expectedData)
+
+	CompareData(expected.Data, result.Data, true, t)
+}
+
+func TestOperatorPlusMultiHeader (t *testing.T) {
+	lhsHeaders := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}, []string{"b"}}
+	lhs := ConstructTable(lhsHeaders, lhsData)
+
+	rhsHeaders := []string{"h2"}
+	rhsData := [][]string{[]string{"a"}}
+	rhs := ConstructTable(rhsHeaders, rhsData)
+
+	result := lhs.OperatorPlus(rhs)
+
+	expectedHeaders := []string{"h1", "h2"}
+	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"", "a"}, []string{"a", ""}, []string{"b", ""}}
+	expected := ConstructTable(expectedHeaders, expectedData)
+
+	CompareData(expected.Data, result.Data, true, t)
+}
+
 func TestRowLessThen (t *testing.T) {
 	headers := []string{"1", "2", "3"}
 	data := [][]string{

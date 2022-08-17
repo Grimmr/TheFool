@@ -223,7 +223,7 @@ func (this *Csv) OperatorOr(rhs *Csv) *Csv {
 
 	//select Headers
 	///copy lhs headers
-	lhsHeaders := []string{} //this is all the ehaders only on lhs
+	lhsHeaders := []string{} //this is all the headers only on lhs
 	for _, element := range this.Headers {
 		out.insertHeader(element)
 		add := true
@@ -419,6 +419,71 @@ func (this *Csv) OperatorRandomSubset(rhs string, random *rand.Rand) *Csv {
 		for i := range this.Index {
 			out.insertRow(this.Data[this.Index[i]])
 		}
+	}
+
+	return out
+}
+
+func (this *Csv) OperatorPlus(rhs *Csv) *Csv {
+	out := NewCsv()
+
+	//select Headers
+	///copy lhs headers
+	lhsHeaders := []string{} //this is all the headers only on lhs
+	for _, element := range this.Headers {
+		out.insertHeader(element)
+		add := true
+		for _, check := range rhs.Headers {
+			if element == check {
+				add = false
+			}
+		}
+		if add {
+			lhsHeaders = append(lhsHeaders, element)
+		}
+	}
+	//add only needed rhs headers
+	rhsHeaders := []string{} //this is all the headers only on rhs
+	for _, targetHeader := range rhs.Headers {
+		add := true
+		for _, checkHeader := range this.Headers {
+			if targetHeader == checkHeader {
+				add = false
+				break
+			}
+		}
+		if add {
+			out.insertHeader(targetHeader)
+			rhsHeaders = append(rhsHeaders, targetHeader)
+		}
+	}
+
+	lhsPos := 0
+	rhsPos := 0
+	for lhsPos < len(this.Data) && rhsPos < len(rhs.Data) {
+		lhsRow := fitHeaders(out.Headers, this.Data[this.Index[lhsPos]])
+		rhsRow := fitHeaders(out.Headers, rhs.Data[rhs.Index[rhsPos]])
+
+		if rowLessThen(out.Headers, lhsRow, rhsRow){
+			out.insertRow(lhsRow)
+			lhsPos++
+		} else if rowLessThen(out.Headers, rhsRow, lhsRow) {
+			out.insertRow(rhsRow)
+			rhsPos++
+		} else {
+			out.insertRow(lhsRow)
+			out.insertRow(rhsRow)
+			lhsPos++
+			rhsPos++
+		}
+	} 
+
+	//only one of these will trigger
+	for ; lhsPos < len(this.Data); lhsPos++ {
+		out.insertRow(this.Data[this.Index[lhsPos]])
+	}
+	for ; rhsPos < len(rhs.Data); rhsPos++ {
+		out.insertRow(rhs.Data[rhs.Index[rhsPos]])
 	}
 
 	return out
