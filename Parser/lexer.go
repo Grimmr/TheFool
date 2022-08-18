@@ -17,6 +17,7 @@ const (
 	LexTokenType_percent
 	LexTokenType_plus
 	LexTokenType_minus
+	LexTokenType_filter
 )
 
 func LexProgramme(prog string) []lexToken {
@@ -39,23 +40,25 @@ func LexProgramme(prog string) []lexToken {
 				out = append(out, lexToken{buffer, LexTokenType_less})
 			case "-":
 				out = append(out, lexToken{buffer, LexTokenType_minus})
+			case "filter":
+				out = append(out, lexToken{buffer, LexTokenType_filter})
 			default:
 				if len(buffer) != 0 {
 					out = append(out, lexToken{buffer, LexTokenType_name})
 				}
 			}
 			buffer = ""
-		}
 
-		switch letter {
-		case '(':
-			out = append(out, lexToken{"'('", LexTokenType_lParen})
-		case ')':
-			out = append(out, lexToken{"')'", LexTokenType_rParen})
-		case '%':
-			out = append(out, lexToken{"%", LexTokenType_percent})
-		case '+':
-			out = append(out, lexToken{"+", LexTokenType_plus})
+			switch letter {
+			case '(':
+				out = append(out, lexToken{"'('", LexTokenType_lParen})
+			case ')':
+				out = append(out, lexToken{"')'", LexTokenType_rParen})
+			case '%':
+				out = append(out, lexToken{"%", LexTokenType_percent})
+			case '+':
+				out = append(out, lexToken{"+", LexTokenType_plus})
+			}
 		}
 	}
 
