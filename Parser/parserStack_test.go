@@ -4,12 +4,12 @@ import (
 	"testing"
 )
 
-//lexer only tests
+// lexer only tests
 func TestLexProgrammeKeywords(t *testing.T) {
 	//should include one of every token
-	programme := "and or a.txt less()%+ -"
+	programme := "and or a.txt less()%+ - filter"
 	result := LexProgramme(programme)
-	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"'('", LexTokenType_lParen}, lexToken{"')'", LexTokenType_rParen}, lexToken{"%", LexTokenType_percent}, lexToken{"+", LexTokenType_plus}, lexToken{"-", LexTokenType_minus}}
+	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"'('", LexTokenType_lParen}, lexToken{"')'", LexTokenType_rParen}, lexToken{"%", LexTokenType_percent}, lexToken{"+", LexTokenType_plus}, lexToken{"-", LexTokenType_minus}, lexToken{"filter", LexTokenType_filter}}
 
 	t.Logf("Lex returned %v", result)
 
@@ -21,10 +21,10 @@ func TestLexProgrammeKeywords(t *testing.T) {
 		if result[index] != expected[index] {
 			t.Errorf("Lex returned wrong token at index %d, expected %+v got %+v", index, expected[index], result[index])
 		}
-	} 
+	}
 }
 
-//WalkParseTree tests
+// WalkParseTree tests
 func TestWalkParseTree(t *testing.T) {
 	programme := &ParseTreeNode{lexToken{"and", LexTokenType_and}, []*ParseTreeNode{&ParseTreeNode{lexToken{"or", LexTokenType_or}, []*ParseTreeNode{&ParseTreeNode{lexToken{"a", LexTokenType_name}, nil}, &ParseTreeNode{lexToken{"b", LexTokenType_name}, nil}}}, &ParseTreeNode{lexToken{"c", LexTokenType_name}, nil}}}
 	result := WalkParseTree(programme)
@@ -34,19 +34,19 @@ func TestWalkParseTree(t *testing.T) {
 	}
 }
 
-//parser only tests ()
-//a simple one level test of and
+// parser only tests ()
+// a simple one level test of and
 func TestParseOnly(t *testing.T) {
 	programme := []lexToken{lexToken{"a", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"b", LexTokenType_name}}
-	result := WalkParseTree(ParseProgramme(programme)) 
+	result := WalkParseTree(ParseProgramme(programme))
 	expected := "(and (a) (b))"
 	if result != expected {
 		t.Fatalf("expected %s, got %s", expected, result)
 	}
 }
 
-//full stack tests
-//operator checks
+// full stack tests
+// operator checks
 func TestParseAnd(t *testing.T) {
 	programme := "a and b"
 	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
@@ -191,7 +191,34 @@ func TestParseMinusBindsLikeLess(t *testing.T) {
 	}
 }
 
-//example programmes
+func TestParseFilterSimple(t *testing.T) {
+	programme := "a filter b"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(filter (a) (b))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseFilterTighterThenAnd(t *testing.T) {
+	programme := "a and b filter c"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(and (a) (filter (b) (c)))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseFilterBindsLikeLess(t *testing.T) {
+	programme := "a less b filter c"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(filter (less (a) (b)) (c))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+// example programmes
 func TestParseProgrammeAndOr(t *testing.T) {
 	programme := "dogs1.csv and dogs2.csv or cats.csv"
 	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
@@ -201,10 +228,10 @@ func TestParseProgrammeAndOr(t *testing.T) {
 	}
 }
 
-//errors
+// errors
 func TestRandomSubestRhsLetterError(t *testing.T) {
-	defer func () {
-		err, ok :=  recover().(error)
+	defer func() {
+		err, ok := recover().(error)
 		if !ok {
 			t.Fatalf("expected error but got nothing")
 		}
@@ -213,22 +240,21 @@ func TestRandomSubestRhsLetterError(t *testing.T) {
 		if actual != expected {
 			t.Errorf("expected error '%s' but got '%s'", expected, actual)
 		}
-		
+
 	}()
-	
+
 	programme := "a%a"
 	WalkParseTree(ParseProgramme(LexProgramme(programme)))
-	
+
 }
 
-
-//helpers
+// helpers
 func compareTrees(a *ParseTreeNode, b *ParseTreeNode) bool {
 	if a.Token != b.Token {
 		return false
 	}
 
-	if len(a.Children) != len(b.Children){
+	if len(a.Children) != len(b.Children) {
 		return false
 	}
 
@@ -236,7 +262,7 @@ func compareTrees(a *ParseTreeNode, b *ParseTreeNode) bool {
 		if !compareTrees(a.Children[index], b.Children[index]) {
 			return false
 		}
-	} 
+	}
 
 	return true
 }

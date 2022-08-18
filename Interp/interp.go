@@ -1,10 +1,11 @@
 package Interp
 
 import (
-	"github.com/Grimmr/TheFool/Parser"
-	"github.com/Grimmr/TheFool/Csv"
 	"math/rand"
 	"time"
+
+	"github.com/Grimmr/TheFool/Csv"
+	"github.com/Grimmr/TheFool/Parser"
 )
 
 func InterpProgramme(root *Parser.ParseTreeNode, buffers *BufferTable, seed *rand.Source) *Csv.Csv {
@@ -12,7 +13,7 @@ func InterpProgramme(root *Parser.ParseTreeNode, buffers *BufferTable, seed *ran
 		v := rand.NewSource(time.Now().UnixNano())
 		seed = &v
 	}
-	
+
 	if buffers == nil {
 		buffers = NewBufferTable()
 	}
@@ -22,7 +23,7 @@ func InterpProgramme(root *Parser.ParseTreeNode, buffers *BufferTable, seed *ran
 
 func interpNode(node *Parser.ParseTreeNode, buffers *BufferTable, random *rand.Rand) *Csv.Csv {
 	switch node.Token.TokenType {
-	case Parser.LexTokenType_name: 
+	case Parser.LexTokenType_name:
 		return buffers.GetOrLoad(node.Token.Literal)
 	case Parser.LexTokenType_or:
 		lhs := interpNode(node.Children[0], buffers, random)
@@ -50,7 +51,11 @@ func interpNode(node *Parser.ParseTreeNode, buffers *BufferTable, random *rand.R
 		lhs := interpNode(node.Children[0], buffers, random)
 		rhs := interpNode(node.Children[1], buffers, random)
 		return lhs.OperatorMinus(rhs)
-	} 
+	case Parser.LexTokenType_filter:
+		lhs := interpNode(node.Children[0], buffers, random)
+		rhs := interpNode(node.Children[1], buffers, random)
+		return lhs.OperatorFilter(rhs)
+	}
 
 	return nil
 }

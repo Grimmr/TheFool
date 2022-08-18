@@ -6,7 +6,7 @@ import (
 )
 
 type ParseTreeNode struct {
-	Token lexToken
+	Token    lexToken
 	Children []*ParseTreeNode
 }
 
@@ -23,7 +23,7 @@ func expandExpr1(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 }
 
 func expandExpr2(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
-	return expandBinExpr(tokens, []lexTokenType{LexTokenType_less, LexTokenType_minus}, expandExpr3)
+	return expandBinExpr(tokens, []lexTokenType{LexTokenType_less, LexTokenType_minus, LexTokenType_filter}, expandExpr3)
 }
 
 func expandExpr3(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
@@ -32,12 +32,12 @@ func expandExpr3(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 }
 
 func expandExpr4(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
-	out, err, newtokens := expandName(tokens);
+	out, err, newtokens := expandName(tokens)
 	if out != nil {
 		return out, err, newtokens
 	}
 
-	out, err, newtokens = expandParens(tokens);
+	out, err, newtokens = expandParens(tokens)
 
 	return out, err, newtokens
 }
@@ -93,14 +93,13 @@ func expandRandomSubset(tokens []lexToken) (*ParseTreeNode, string, []lexToken) 
 		out = holder
 	}
 
-
 	//return the generated node and consume tokens
 	return out, "", tokens
 }
 
 func expandParens(tokens []lexToken) (*ParseTreeNode, string, []lexToken) {
 	out := ParseTreeNode{}
-	
+
 	if !expect(tokens, []lexTokenType{LexTokenType_lParen}) {
 		return nil, "expected left paren but got " + topLiteral(tokens), tokens
 	}
@@ -177,19 +176,17 @@ func expandBinExpr(tokens []lexToken, targetOperators []lexTokenType, nextExpr f
 		out = holder
 	}
 
-
 	//return the generated node and consume tokens
 	return out, "", tokens
 }
 
-
 func WalkParseTree(node *ParseTreeNode) string {
-	out := "(" + node.Token.Literal 
+	out := "(" + node.Token.Literal
 	for _, element := range node.Children {
 		out += " " + WalkParseTree(element)
 	}
 	out += ")"
-	return out;
+	return out
 }
 
 func expect(tokens []lexToken, targets []lexTokenType) bool {
