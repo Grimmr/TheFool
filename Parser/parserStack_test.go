@@ -164,6 +164,32 @@ func TestParsePlusBindsLikeAndOr(t *testing.T) {
 	}
 }
 
+func TestParseMinusSimple(t *testing.T) {
+	programme := "a - b"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(- (a) (b))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseMinusBindsTighterThenAndOr(t *testing.T) {
+	programme := "a - b and c - d"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(and (- (a) (b)) (- (c) (d)))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseMinusBindsLikeLess(t *testing.T) {
+	programme := "a - b less c - d"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(- (less (- (a) (b)) (c)) (d))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
 
 //example programmes
 func TestParseProgrammeAndOr(t *testing.T) {
