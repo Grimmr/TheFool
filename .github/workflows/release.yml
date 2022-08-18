@@ -12,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: get-tags
+        run: git fetch origin 'refs/tags/*:refs/tags/*'
+
       - name: build-linux
         run: go build . && tar -czvf TheFoolLin.tar.gz TheFool
 
@@ -19,7 +22,7 @@ jobs:
         run: GOOS=windows go build . && tar -czvf TheFoolWin.tar.gz TheFool.exe
 
       - name: set tag name
-        run: echo "::set-output name=TAGNAME::@$(git show-ref HEAD --abbrev --hash --head)" && git tag @$(git show-ref HEAD --abbrev --hash --head) HEAD
+        run:  tagpfx=$(date +"%Y").$(date +"%m") && tag=${tagpfx}.$(git tag | grep "$tagpfx" | wc -l) && echo "::set-output name=TAGNAME::$tag" && git tag $tag HEAD
         id: setTagName
       
       - uses: ncipollo/release-action@v1
