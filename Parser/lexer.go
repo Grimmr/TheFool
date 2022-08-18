@@ -16,6 +16,7 @@ const (
 	LexTokenType_rParen
 	LexTokenType_percent
 	LexTokenType_plus
+	LexTokenType_minus
 )
 
 func LexProgramme(prog string) []lexToken {
@@ -36,6 +37,8 @@ func LexProgramme(prog string) []lexToken {
 				out = append(out, lexToken{buffer, LexTokenType_or})
 			case "less":
 				out = append(out, lexToken{buffer, LexTokenType_less})
+			case "-":
+				out = append(out, lexToken{buffer, LexTokenType_minus})
 			default:
 				if len(buffer) != 0 {
 					out = append(out, lexToken{buffer, LexTokenType_name})
