@@ -191,6 +191,33 @@ func TestParseMinusBindsLikeLess(t *testing.T) {
 	}
 }
 
+func TestParseFilterSimple(t *testing.T) {
+	programme := "a filter b"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(filter (a) (b))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseFilterTighterThenAnd(t *testing.T) {
+	programme := "a and b filter c"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(and (a) (filter (b) (c)))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseFilterBindsLikeLess(t *testing.T) {
+	programme := "a less b filter c"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(filter (less (a) (b)) (c))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
 // example programmes
 func TestParseProgrammeAndOr(t *testing.T) {
 	programme := "dogs1.csv and dogs2.csv or cats.csv"
