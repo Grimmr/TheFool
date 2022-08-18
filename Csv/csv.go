@@ -1,27 +1,27 @@
 package Csv
 
-import(
+import (
+	"errors"
 	"io/ioutil"
+	"math/rand"
+	"os"
+	"sort"
+	"strconv"
 	"strings"
 	"testing"
-	"os"
-	"errors"
-	"math/rand"
-	"strconv"
-	"sort"
 )
 
 type Csv struct {
-	Headers []string
-	Data []map[string]string
-	Index []int
-	Raw string
-	RawPos int
-	EndRow byte
+	Headers  []string
+	Data     []map[string]string
+	Index    []int
+	Raw      string
+	RawPos   int
+	EndRow   byte
 	EndField byte
 }
 
-func NewCsv () *Csv {
+func NewCsv() *Csv {
 	var out Csv
 	out.EndRow = byte('\n')
 	out.EndField = byte(',')
@@ -29,7 +29,7 @@ func NewCsv () *Csv {
 	return &out
 }
 
-func (this *Csv) empty () {
+func (this *Csv) empty() {
 	this.Headers = []string{}
 	this.Data = []map[string]string{}
 	this.Index = []int{}
@@ -37,19 +37,18 @@ func (this *Csv) empty () {
 	this.RawPos = 0
 }
 
-func (this *Csv) Read (path string) bool {
+func (this *Csv) Read(path string) bool {
 	//reset members
 	this.empty()
 
 	//attempt to read file into a buffer
 	bytes, err := ioutil.ReadFile(path)
-	
-	if os.IsNotExist(err)  {
+
+	if os.IsNotExist(err) {
 		panic(errors.New("file/path not found " + path))
 	}
 
 	this.Raw = string(bytes)
-
 
 	var lineBuffer []string
 
@@ -61,7 +60,7 @@ func (this *Csv) Read (path string) bool {
 
 	//read lines
 	for lineBuffer, cont := this.parseLine(); cont; lineBuffer, cont = this.parseLine() {
-		row := make(map[string]string) 
+		row := make(map[string]string)
 		//check row width
 		if len(lineBuffer) != len(this.Headers) {
 			continue
@@ -81,7 +80,7 @@ func (this *Csv) Read (path string) bool {
 	return true
 }
 
-func (this *Csv) parseLine () ([]string, bool) {
+func (this *Csv) parseLine() ([]string, bool) {
 	var out []string
 	var buffer string
 
@@ -107,13 +106,13 @@ func (this *Csv) parseLine () ([]string, bool) {
 	if buffer != "" {
 		out = append(out, buffer)
 	}
-	return out, len(out) != 0 
-} 
+	return out, len(out) != 0
+}
 
-func (this *Csv) generateIndex () {
+func (this *Csv) generateIndex() {
 	this.Index = []int{}
 	unsorted := make([]int, len(this.Data))
-	
+
 	for index, _ := range this.Data {
 		unsorted[index] = index
 	}
@@ -132,7 +131,7 @@ func (this *Csv) generateIndex () {
 	}
 }
 
-func rowLessThen (headers []string, lhs map[string]string, rhs map[string]string) bool {
+func rowLessThen(headers []string, lhs map[string]string, rhs map[string]string) bool {
 	for _, field := range headers {
 		if lhs[field] < rhs[field] {
 			return true
@@ -163,28 +162,28 @@ func (this *Csv) ToString() string {
 			first = false
 			out += row[field]
 		}
-		out += "\n" 
+		out += "\n"
 	}
 	return out
 }
 
-//this assumes the header isn't a dupe
+// this assumes the header isn't a dupe
 func (this *Csv) insertHeader(header string) {
 	//add the header
 	this.Headers = append(this.Headers, header)
-	
+
 	//add entries for each row
 	for _, row := range this.Data {
 		row[header] = ""
 	}
 }
 
-func fitHeaders (headers []string, oldRow map[string]string) map[string]string {
+func fitHeaders(headers []string, oldRow map[string]string) map[string]string {
 	newRow := map[string]string{}
 	for k, v := range oldRow {
 		newRow[k] = v
 	}
-	
+
 	//add new headers
 	for _, header := range headers {
 		if _, ok := newRow[header]; !ok {
@@ -211,9 +210,9 @@ func fitHeaders (headers []string, oldRow map[string]string) map[string]string {
 
 func (this *Csv) insertRow(row map[string]string) {
 	//add the row
-	this.Data = append(this.Data, fitHeaders(this.Headers, row)) 
+	this.Data = append(this.Data, fitHeaders(this.Headers, row))
 
-	//for now we assume index position is guaranteed 
+	//for now we assume index position is guaranteed
 	this.Index = append(this.Index, len(this.Index))
 }
 
@@ -256,9 +255,9 @@ func (this *Csv) OperatorOr(rhs *Csv) *Csv {
 	for lhsPos < len(this.Data) && rhsPos < len(rhs.Data) {
 		lhsRow := fitHeaders(out.Headers, this.Data[this.Index[lhsPos]])
 		rhsRow := fitHeaders(out.Headers, rhs.Data[rhs.Index[rhsPos]])
-		var addedRow map[string]string 
+		var addedRow map[string]string
 
-		if rowLessThen(out.Headers, lhsRow, rhsRow){
+		if rowLessThen(out.Headers, lhsRow, rhsRow) {
 			out.insertRow(lhsRow)
 			addedRow = lhsRow
 		} else if rowLessThen(out.Headers, rhsRow, lhsRow) {
@@ -284,7 +283,7 @@ func (this *Csv) OperatorOr(rhs *Csv) *Csv {
 				break
 			}
 		}
-	} 
+	}
 
 	//only one of these will trigger
 	for ; lhsPos < len(this.Data); lhsPos++ {
@@ -307,7 +306,7 @@ func (this *Csv) OperatorAnd(rhs *Csv) *Csv {
 				out.insertHeader(targetHeader)
 				break
 			}
-		} 
+		}
 	}
 
 	//select rows
@@ -316,9 +315,9 @@ func (this *Csv) OperatorAnd(rhs *Csv) *Csv {
 	for lhsPos < len(this.Data) && rhsPos < len(rhs.Data) {
 		lhsRow := fitHeaders(out.Headers, this.Data[this.Index[lhsPos]])
 		rhsRow := fitHeaders(out.Headers, rhs.Data[rhs.Index[rhsPos]])
-		var addedRow map[string]string 
+		var addedRow map[string]string
 
-		if matchRow(out.Headers, lhsRow, rhsRow){
+		if matchRow(out.Headers, lhsRow, rhsRow) {
 			out.insertRow(lhsRow)
 			addedRow = lhsRow
 
@@ -342,7 +341,7 @@ func (this *Csv) OperatorAnd(rhs *Csv) *Csv {
 		} else if rowLessThen(out.Headers, rhsRow, lhsRow) {
 			rhsPos++
 		}
-	} 
+	}
 
 	return out
 }
@@ -374,7 +373,7 @@ func (this *Csv) OperatorLess(rhs *Csv) *Csv {
 		} else if rowLessThen(out.Headers, lhsRow, rhsRow) {
 			out.insertRow(this.Data[this.Index[lhsPos]])
 			lhsPos++
-		} else  {
+		} else {
 			rhsPos++
 		}
 	}
@@ -416,7 +415,7 @@ func (this *Csv) OperatorMinus(rhs *Csv) *Csv {
 		} else if rowLessThen(out.Headers, lhsRow, rhsRow) {
 			out.insertRow(this.Data[this.Index[lhsPos]])
 			lhsPos++
-		} else  {
+		} else {
 			rhsPos++
 		}
 	}
@@ -438,7 +437,7 @@ func (this *Csv) OperatorRandomSubset(rhs string, random *rand.Rand) *Csv {
 		out.insertHeader(field)
 	}
 
-	//select data 
+	//select data
 	targetCount, _ := strconv.Atoi(rhs)
 	if targetCount < len(this.Data) {
 		targets := make([]int, 0)
@@ -455,7 +454,7 @@ func (this *Csv) OperatorRandomSubset(rhs string, random *rand.Rand) *Csv {
 		sort.Ints(targets)
 		for _, row := range targets {
 			out.insertRow(this.Data[this.Index[row]])
-		} 
+		}
 	} else {
 		for i := range this.Index {
 			out.insertRow(this.Data[this.Index[i]])
@@ -505,7 +504,7 @@ func (this *Csv) OperatorPlus(rhs *Csv) *Csv {
 		lhsRow := fitHeaders(out.Headers, this.Data[this.Index[lhsPos]])
 		rhsRow := fitHeaders(out.Headers, rhs.Data[rhs.Index[rhsPos]])
 
-		if rowLessThen(out.Headers, lhsRow, rhsRow){
+		if rowLessThen(out.Headers, lhsRow, rhsRow) {
 			out.insertRow(lhsRow)
 			lhsPos++
 		} else if rowLessThen(out.Headers, rhsRow, lhsRow) {
@@ -517,7 +516,7 @@ func (this *Csv) OperatorPlus(rhs *Csv) *Csv {
 			lhsPos++
 			rhsPos++
 		}
-	} 
+	}
 
 	//only one of these will trigger
 	for ; lhsPos < len(this.Data); lhsPos++ {
@@ -530,6 +529,34 @@ func (this *Csv) OperatorPlus(rhs *Csv) *Csv {
 	return out
 }
 
+func (this *Csv) OperatorFilter(rhs *Csv) *Csv {
+	out := NewCsv()
+
+	//select headers
+	for _, targetHeader := range this.Headers {
+		out.insertHeader(targetHeader)
+	}
+
+	//select rows
+	lhsPos := 0
+	rhsPos := 0
+	for lhsPos < len(this.Data) && rhsPos < len(rhs.Data) {
+		lhsRow := fitHeaders(out.Headers, this.Data[this.Index[lhsPos]])
+		rhsRow := fitHeaders(out.Headers, rhs.Data[rhs.Index[rhsPos]])
+
+		if matchRow(out.Headers, lhsRow, rhsRow) {
+			out.insertRow(lhsRow)
+			lhsPos++
+		} else if rowLessThen(out.Headers, lhsRow, rhsRow) {
+			lhsPos++
+		} else if rowLessThen(out.Headers, rhsRow, lhsRow) {
+			rhsPos++
+		}
+	}
+
+	return out
+}
+
 func matchRow(headers []string, lhs map[string]string, rhs map[string]string) bool {
 	for _, k := range headers {
 		if lhs[k] != rhs[k] {
@@ -537,16 +564,16 @@ func matchRow(headers []string, lhs map[string]string, rhs map[string]string) bo
 		}
 	}
 	return true
-} 
+}
 
-//helpers that should be in a test file but cant due to export semantics
+// helpers that should be in a test file but cant due to export semantics
 func ConstructTable(headers []string, data [][]string) *Csv {
 	out := NewCsv()
 	out.Headers = headers
 
 	for _, row := range data {
 		newRow := make(map[string]string)
-		for index,  field := range row {
+		for index, field := range row {
 			newRow[headers[index]] = field
 		}
 		out.Data = append(out.Data, newRow)
@@ -574,5 +601,5 @@ func CompareData(expected []map[string]string, actual []map[string]string, check
 				t.Errorf("expected row %d, field %s to have value %s, but found %s", index, k, expected[index][k], actual[index][k])
 			}
 		}
-	} 
+	}
 }

@@ -1,20 +1,20 @@
 package Csv
 
 import (
-	"testing"
-	"reflect"
 	"math/rand"
+	"reflect"
+	"testing"
 )
 
 func TestParseLine(t *testing.T) {
 	table := NewCsv()
 	table.Raw = "h1,h2,h3\na,b,c\nd,e,f"
-	
+
 	//0
 	t.Logf("Row 0")
 	row, cont := table.parseLine()
-	expected := []string{"h1","h2","h3"}
-	if !reflect.DeepEqual(expected,row) {
+	expected := []string{"h1", "h2", "h3"}
+	if !reflect.DeepEqual(expected, row) {
 		t.Errorf("expected %v, got %v", expected, row)
 	}
 	if !cont {
@@ -23,8 +23,8 @@ func TestParseLine(t *testing.T) {
 	//1
 	t.Logf("Row 1")
 	row, cont = table.parseLine()
-	expected = []string{"a","b","c"}
-	if !reflect.DeepEqual(expected,row) {
+	expected = []string{"a", "b", "c"}
+	if !reflect.DeepEqual(expected, row) {
 		t.Errorf("expected %v, got %v", expected, row)
 	}
 	if !cont {
@@ -33,8 +33,8 @@ func TestParseLine(t *testing.T) {
 	//2
 	t.Logf("Row 2")
 	row, cont = table.parseLine()
-	expected = []string{"d","e","f"}
-	if !reflect.DeepEqual(expected,row) {
+	expected = []string{"d", "e", "f"}
+	if !reflect.DeepEqual(expected, row) {
 		t.Errorf("expected %v, got %v", expected, row)
 	}
 	if !cont {
@@ -54,12 +54,12 @@ func TestParseLine(t *testing.T) {
 func TestParseLineTrailingNewLine(t *testing.T) {
 	table := NewCsv()
 	table.Raw = "h1,h2,h3\na,b,c\nd,e,f\n"
-	
+
 	//0
 	t.Logf("Row 0")
 	row, cont := table.parseLine()
-	expected := []string{"h1","h2","h3"}
-	if !reflect.DeepEqual(expected,row) {
+	expected := []string{"h1", "h2", "h3"}
+	if !reflect.DeepEqual(expected, row) {
 		t.Errorf("expected %v, got %v", expected, row)
 	}
 	if !cont {
@@ -68,8 +68,8 @@ func TestParseLineTrailingNewLine(t *testing.T) {
 	//1
 	t.Logf("Row 1")
 	row, cont = table.parseLine()
-	expected = []string{"a","b","c"}
-	if !reflect.DeepEqual(expected,row) {
+	expected = []string{"a", "b", "c"}
+	if !reflect.DeepEqual(expected, row) {
 		t.Errorf("expected %v, got %v", expected, row)
 	}
 	if !cont {
@@ -78,8 +78,8 @@ func TestParseLineTrailingNewLine(t *testing.T) {
 	//2
 	t.Logf("Row 2")
 	row, cont = table.parseLine()
-	expected = []string{"d","e","f"}
-	if !reflect.DeepEqual(expected,row) {
+	expected = []string{"d", "e", "f"}
+	if !reflect.DeepEqual(expected, row) {
 		t.Errorf("expected %v, got %v", expected, row)
 	}
 	if !cont {
@@ -96,13 +96,13 @@ func TestParseLineTrailingNewLine(t *testing.T) {
 	}
 }
 
-func TestRead (t *testing.T) {
+func TestRead(t *testing.T) {
 	table := NewCsv()
 	table.Read("test_data/dogs2.csv")
 
 	t.Logf("headers")
 	expectedHeaders := []string{"name", "breed", "age"}
-	if !reflect.DeepEqual(expectedHeaders,table.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, table.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, table.Headers)
 	}
 
@@ -115,13 +115,13 @@ func TestRead (t *testing.T) {
 	CompareData(expectedTable.Data, table.Data, true, t)
 }
 
-func TestReadTrailingNewLine (t *testing.T) {
+func TestReadTrailingNewLine(t *testing.T) {
 	table := NewCsv()
 	table.Read("test_data/dogs1.csv")
 
 	t.Logf("headers")
 	expectedHeaders := []string{"name", "breed", "age"}
-	if !reflect.DeepEqual(expectedHeaders,table.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, table.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, table.Headers)
 	}
 
@@ -134,15 +134,15 @@ func TestReadTrailingNewLine (t *testing.T) {
 	CompareData(expectedTable.Data, table.Data, true, t)
 }
 
-func TestReadDouble (t *testing.T) {
+func TestReadDouble(t *testing.T) {
 	table := NewCsv()
 	table.Read("test_data/dogs1.csv")
 	table.Read("test_data/people.csv")
 
-	//headers 
+	//headers
 	t.Logf("headers")
 	expectedHeaders := []string{"name", "age", "pay"}
-	if !reflect.DeepEqual(expectedHeaders,table.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, table.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, table.Headers)
 	}
 
@@ -156,7 +156,7 @@ func TestReadDouble (t *testing.T) {
 	CompareData(expectedTable.Data, table.Data, true, t)
 }
 
-func TestOperatorOrSimple (t *testing.T) {
+func TestOperatorOrSimple(t *testing.T) {
 	headers := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}}
 	lhs := ConstructTable(headers, lhsData)
@@ -174,7 +174,7 @@ func TestOperatorOrSimple (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
-func TestOperatorOrNewHeaderSimple (t *testing.T) {
+func TestOperatorOrNewHeaderSimple(t *testing.T) {
 	lhsheaders := []string{"h1", "lh"}
 	lhsData := [][]string{[]string{"a", "b"}}
 	lhs := ConstructTable(lhsheaders, lhsData)
@@ -186,19 +186,19 @@ func TestOperatorOrNewHeaderSimple (t *testing.T) {
 	result := lhs.OperatorOr(rhs)
 
 	expectedHeaders := []string{"h1", "lh", "rh"}
-	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
 	expectedData := [][]string{
-		[]string{"a", "b", ""}, 
+		[]string{"a", "b", ""},
 		[]string{"c", "", "d"}}
 	expected := ConstructTable(expectedHeaders, expectedData)
 
 	CompareData(expected.Data, result.Data, true, t)
 }
 
-func TestToString (t *testing.T) {
+func TestToString(t *testing.T) {
 	Headers := []string{"h", "l"}
 	Data := [][]string{
 		[]string{"a", "b"},
@@ -212,7 +212,7 @@ func TestToString (t *testing.T) {
 	}
 }
 
-func TestOperatorOrOperandsNotModified (t *testing.T) {
+func TestOperatorOrOperandsNotModified(t *testing.T) {
 	lhsHeaders := []string{"h", "l"}
 	lhsData := [][]string{
 		[]string{"a", "b"},
@@ -227,10 +227,10 @@ func TestOperatorOrOperandsNotModified (t *testing.T) {
 
 	lhs.OperatorOr(rhs)
 
-	if !reflect.DeepEqual(lhsHeaders,lhs.Headers) {
+	if !reflect.DeepEqual(lhsHeaders, lhs.Headers) {
 		t.Errorf("lhs headers: expected %v, got %v", lhsHeaders, lhs.Headers)
 	}
-	if !reflect.DeepEqual(rhsHeaders,rhs.Headers) {
+	if !reflect.DeepEqual(rhsHeaders, rhs.Headers) {
 		t.Errorf("rhs headers: expected %v, got %v", rhsHeaders, rhs.Headers)
 	}
 
@@ -241,7 +241,7 @@ func TestOperatorOrOperandsNotModified (t *testing.T) {
 	CompareData(ConstructTable(rhsHeaders, rhsData).Data, rhs.Data, true, t)
 }
 
-func TestOperatorAndSimple (t *testing.T) {
+func TestOperatorAndSimple(t *testing.T) {
 	headers := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}, []string{"b"}}
 	lhs := ConstructTable(headers, lhsData)
@@ -257,7 +257,7 @@ func TestOperatorAndSimple (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
-func TestOperatorAndNewHeaderSimple (t *testing.T) {
+func TestOperatorAndNewHeaderSimple(t *testing.T) {
 	lhsheaders := []string{"h1", "lh"}
 	lhsData := [][]string{[]string{"a", "b"}}
 	lhs := ConstructTable(lhsheaders, lhsData)
@@ -269,17 +269,17 @@ func TestOperatorAndNewHeaderSimple (t *testing.T) {
 	result := lhs.OperatorAnd(rhs)
 
 	expectedHeaders := []string{"h1"}
-	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"a"}} 
+	expectedData := [][]string{[]string{"a"}}
 	expected := ConstructTable(expectedHeaders, expectedData)
 
 	CompareData(expected.Data, result.Data, true, t)
 }
 
-func TestOperatorLessSimple (t *testing.T) {
+func TestOperatorLessSimple(t *testing.T) {
 	lhsheaders := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}, []string{"b"}}
 	lhs := ConstructTable(lhsheaders, lhsData)
@@ -291,61 +291,61 @@ func TestOperatorLessSimple (t *testing.T) {
 	result := lhs.OperatorLess(rhs)
 
 	expectedHeaders := []string{"h1"}
-	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"a"}} 
+	expectedData := [][]string{[]string{"a"}}
 	expected := ConstructTable(expectedHeaders, expectedData)
 
 	CompareData(expected.Data, result.Data, true, t)
 }
 
-func TestOperatorRandomSubsetSimple (t *testing.T) {
+func TestOperatorRandomSubsetSimple(t *testing.T) {
 	random := rand.New(rand.NewSource(8))
-	
+
 	lhsheaders := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}, []string{"b"}, []string{"c"}, []string{"d"}, []string{"e"}, []string{"f"}, []string{"g"}}
 	lhs := ConstructTable(lhsheaders, lhsData)
-	
+
 	rhs := "3"
 
 	result := lhs.OperatorRandomSubset(rhs, random)
 
 	expectedHeaders := []string{"h1"}
-	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"a"}, []string{"c"}, []string{"e"}} 
+	expectedData := [][]string{[]string{"a"}, []string{"c"}, []string{"e"}}
 	expectedTable := ConstructTable(expectedHeaders, expectedData)
 
 	CompareData(expectedTable.Data, result.Data, true, t)
 }
 
-func TestOperatorRandomSubsetRhsToBig (t *testing.T) {
+func TestOperatorRandomSubsetRhsToBig(t *testing.T) {
 	random := rand.New(rand.NewSource(8))
-	
+
 	lhsheaders := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}, []string{"b"}, []string{"c"}}
 	lhs := ConstructTable(lhsheaders, lhsData)
-	
+
 	rhs := "8"
 
 	result := lhs.OperatorRandomSubset(rhs, random)
 
 	expectedHeaders := []string{"h1"}
-	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"a"}, []string{"b"}, []string{"c"}} 
+	expectedData := [][]string{[]string{"a"}, []string{"b"}, []string{"c"}}
 	expectedTable := ConstructTable(expectedHeaders, expectedData)
 
 	CompareData(expectedTable.Data, result.Data, true, t)
 }
 
-func TestOperatorPlusSimple (t *testing.T) {
+func TestOperatorPlusSimple(t *testing.T) {
 	headers := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}, []string{"b"}}
 	lhs := ConstructTable(headers, lhsData)
@@ -361,7 +361,7 @@ func TestOperatorPlusSimple (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
-func TestOperatorPlusMultiHeader (t *testing.T) {
+func TestOperatorPlusMultiHeader(t *testing.T) {
 	lhsHeaders := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}, []string{"b"}}
 	lhs := ConstructTable(lhsHeaders, lhsData)
@@ -373,7 +373,7 @@ func TestOperatorPlusMultiHeader (t *testing.T) {
 	result := lhs.OperatorPlus(rhs)
 
 	expectedHeaders := []string{"h1", "h2"}
-	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
@@ -383,7 +383,7 @@ func TestOperatorPlusMultiHeader (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
-func TestOperatorMinusSimple (t *testing.T) {
+func TestOperatorMinusSimple(t *testing.T) {
 	lhsHeaders := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}, []string{"b"}, []string{"b"}, []string{"b"}}
 	lhs := ConstructTable(lhsHeaders, lhsData)
@@ -395,7 +395,7 @@ func TestOperatorMinusSimple (t *testing.T) {
 	result := lhs.OperatorMinus(rhs)
 
 	expectedHeaders := []string{"h1"}
-	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
@@ -405,7 +405,7 @@ func TestOperatorMinusSimple (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
-func TestOperatorMinusTooManyInRhs (t *testing.T) {
+func TestOperatorMinusTooManyInRhs(t *testing.T) {
 	lhsHeaders := []string{"h1"}
 	lhsData := [][]string{[]string{"a"}, []string{"b"}}
 	lhs := ConstructTable(lhsHeaders, lhsData)
@@ -417,7 +417,7 @@ func TestOperatorMinusTooManyInRhs (t *testing.T) {
 	result := lhs.OperatorMinus(rhs)
 
 	expectedHeaders := []string{"h1"}
-	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
 		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
@@ -427,48 +427,92 @@ func TestOperatorMinusTooManyInRhs (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
-func TestRowLessThen (t *testing.T) {
+func TestOperatorFilterSimple(t *testing.T) {
+	lhsHeaders := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}, []string{"b"}, []string{"b"}, []string{"b"}}
+	lhs := ConstructTable(lhsHeaders, lhsData)
+
+	rhsHeaders := []string{"h1"}
+	rhsData := [][]string{[]string{"b"}, []string{"b"}}
+	rhs := ConstructTable(rhsHeaders, rhsData)
+
+	result := lhs.OperatorFilter(rhs)
+
+	expectedHeaders := []string{"h1"}
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"b"}, []string{"b"}, []string{"b"}}
+	expected := ConstructTable(expectedHeaders, expectedData)
+
+	CompareData(expected.Data, result.Data, true, t)
+}
+
+func TestOperatorFilterHeaderMissmatch(t *testing.T) {
+	lhsHeaders := []string{"h1", "h2"}
+	lhsData := [][]string{[]string{"a", ""}, []string{"b", ""}, []string{"b", ""}, []string{"b", ""}}
+	lhs := ConstructTable(lhsHeaders, lhsData)
+
+	rhsHeaders := []string{"h1", "h3"}
+	rhsData := [][]string{[]string{"b", "a"}, []string{"b", "a"}}
+	rhs := ConstructTable(rhsHeaders, rhsData)
+
+	result := lhs.OperatorFilter(rhs)
+
+	expectedHeaders := []string{"h1", "h2"}
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"b", ""}, []string{"b", ""}, []string{"b", ""}}
+	expected := ConstructTable(expectedHeaders, expectedData)
+
+	CompareData(expected.Data, result.Data, true, t)
+}
+
+func TestRowLessThen(t *testing.T) {
 	headers := []string{"1", "2", "3"}
 	data := [][]string{
 		[]string{"a", "b", "a"},
 		[]string{"b", "b", "b"},
 		[]string{"a", "a", "c"},
-	  	[]string{"c", "c", "c"}}
+		[]string{"c", "c", "c"}}
 
 	table := ConstructTable(headers, data)
 
-	expected := true 
+	expected := true
 	actual := rowLessThen(headers, table.Data[0], table.Data[3])
 	if expected != actual {
 		t.Errorf("test 1: expected %t, got %t", expected, actual)
 	}
 
-	expected = false 
+	expected = false
 	actual = rowLessThen(headers, table.Data[0], table.Data[0])
 	if expected != actual {
 		t.Errorf("test 2: expected %t, got %t", expected, actual)
 	}
 
-	expected = false 
+	expected = false
 	actual = rowLessThen(headers, table.Data[3], table.Data[0])
 	if expected != actual {
 		t.Errorf("test 3: expected %t, got %t", expected, actual)
 	}
 }
 
-func TestGenerateIndex (t *testing.T) {
+func TestGenerateIndex(t *testing.T) {
 	headers := []string{"1", "2", "3"}
 	data := [][]string{
 		[]string{"a", "b", "a"},
 		[]string{"b", "b", "b"},
 		[]string{"a", "a", "c"},
-	  	[]string{"c", "c", "c"}}
+		[]string{"c", "c", "c"}}
 
 	table := ConstructTable(headers, data)
 	table.generateIndex()
 
 	expectedIndex := []int{2, 0, 1, 3}
-	
+
 	expectedLen := len(expectedIndex)
 	actualLen := len(table.Index)
 	if expectedLen != actualLen {
@@ -480,11 +524,11 @@ func TestGenerateIndex (t *testing.T) {
 	}
 }
 
-func TestFitHeaders (t *testing.T) {
+func TestFitHeaders(t *testing.T) {
 	headers := []string{"a", "b"}
-	row := map[string]string{"a":"a", "c":"c"}
+	row := map[string]string{"a": "a", "c": "c"}
 
-	expected := map[string]string{"a":"a", "b":""}
+	expected := map[string]string{"a": "a", "b": ""}
 	actual := fitHeaders(headers, row)
 
 	if !reflect.DeepEqual(expected, actual) {
@@ -492,7 +536,7 @@ func TestFitHeaders (t *testing.T) {
 	}
 }
 
-func TestMatchRow (t *testing.T) {
+func TestMatchRow(t *testing.T) {
 	headers := []string{"a", "b"}
 	data := [][]string{
 		[]string{"a", "b"},
