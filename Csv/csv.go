@@ -532,26 +532,38 @@ func (this *Csv) OperatorPlus(rhs *Csv) *Csv {
 func (this *Csv) OperatorFilter(rhs *Csv) *Csv {
 	out := NewCsv()
 
+	comparisonHeaders := make([]string, 0)
+
 	//select headers
 	for _, targetHeader := range this.Headers {
 		out.insertHeader(targetHeader)
+		for _, checkHeader := range rhs.Headers {
+			if targetHeader == checkHeader {
+				comparisonHeaders = append(comparisonHeaders, targetHeader)
+				break
+			}
+		}
 	}
 
 	//select rows
 	lhsPos := 0
 	rhsPos := 0
 	for lhsPos < len(this.Data) && rhsPos < len(rhs.Data) {
-		lhsRow := fitHeaders(out.Headers, this.Data[this.Index[lhsPos]])
-		rhsRow := fitHeaders(out.Headers, rhs.Data[rhs.Index[rhsPos]])
+		lhsRow := fitHeaders(comparisonHeaders, this.Data[this.Index[lhsPos]])
+		rhsRow := fitHeaders(comparisonHeaders, rhs.Data[rhs.Index[rhsPos]])
 
 		if matchRow(out.Headers, lhsRow, rhsRow) {
-			out.insertRow(lhsRow)
+			out.insertRow(this.Data[this.Index[lhsPos]])
 			lhsPos++
 		} else if rowLessThen(out.Headers, lhsRow, rhsRow) {
 			lhsPos++
 		} else if rowLessThen(out.Headers, rhsRow, lhsRow) {
 			rhsPos++
 		}
+	}
+
+	for ; lhsPos < len(this.Data); lhsPos++ {
+		out.insertRow(this.Data[this.Index[lhsPos]])
 	}
 
 	return out

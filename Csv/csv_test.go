@@ -451,7 +451,7 @@ func TestOperatorFilterSimple(t *testing.T) {
 
 func TestOperatorFilterHeaderMissmatch(t *testing.T) {
 	lhsHeaders := []string{"h1", "h2"}
-	lhsData := [][]string{[]string{"a", ""}, []string{"b", ""}, []string{"b", ""}, []string{"b", ""}}
+	lhsData := [][]string{[]string{"a", "e"}, []string{"b", "f"}, []string{"b", "i"}, []string{"b", "i"}}
 	lhs := ConstructTable(lhsHeaders, lhsData)
 
 	rhsHeaders := []string{"h1", "h3"}
@@ -465,7 +465,7 @@ func TestOperatorFilterHeaderMissmatch(t *testing.T) {
 		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"b", ""}, []string{"b", ""}, []string{"b", ""}}
+	expectedData := [][]string{[]string{"b", "f"}, []string{"b", "i"}, []string{"b", "i"}}
 	expected := ConstructTable(expectedHeaders, expectedData)
 
 	CompareData(expected.Data, result.Data, true, t)

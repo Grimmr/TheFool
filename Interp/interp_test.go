@@ -1,14 +1,15 @@
 package Interp
 
 import (
-	"testing"
-	"reflect"
 	"math/rand"
-	"github.com/Grimmr/TheFool/Parser"
+	"reflect"
+	"testing"
+
 	"github.com/Grimmr/TheFool/Csv"
+	"github.com/Grimmr/TheFool/Parser"
 )
 
-func TestInterpName (t *testing.T) {
+func TestInterpName(t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv"))
 
 	result := InterpProgramme(programme, nil, nil)
@@ -19,13 +20,13 @@ func TestInterpName (t *testing.T) {
 	}
 
 	expectedData := [][]string{
-		[]string{"a","b","c"},
-		[]string{"d","e","f"}}
-	
+		[]string{"a", "b", "c"},
+		[]string{"d", "e", "f"}}
+
 	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
 
-func TestInterpOr (t *testing.T) {
+func TestInterpOr(t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv or test_data/simple2.csv"))
 
 	result := InterpProgramme(programme, nil, nil)
@@ -37,13 +38,13 @@ func TestInterpOr (t *testing.T) {
 
 	expectedData := [][]string{
 		[]string{"a", "", "", "b"},
-		[]string{"a","b","c", ""},
-		[]string{"d","e","f", ""}}
-	
+		[]string{"a", "b", "c", ""},
+		[]string{"d", "e", "f", ""}}
+
 	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
 
-func TestInterpAnd (t *testing.T) {
+func TestInterpAnd(t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/andData.csv and test_data/andData2.csv"))
 
 	result := InterpProgramme(programme, nil, nil)
@@ -53,12 +54,12 @@ func TestInterpAnd (t *testing.T) {
 		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"a","b","c"}}
-	
+	expectedData := [][]string{[]string{"a", "b", "c"}}
+
 	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
 
-func TestInterpLess (t *testing.T) {
+func TestInterpLess(t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/andData.csv less test_data/andData2.csv"))
 
 	result := InterpProgramme(programme, nil, nil)
@@ -68,12 +69,12 @@ func TestInterpLess (t *testing.T) {
 		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"d","e","f"}}
-	
-	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t) 
+	expectedData := [][]string{[]string{"d", "e", "f"}}
+
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
 
-func TestInterpParen (t *testing.T) {
+func TestInterpParen(t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("(test_data/simple.csv)"))
 
 	result := InterpProgramme(programme, nil, nil)
@@ -83,12 +84,12 @@ func TestInterpParen (t *testing.T) {
 		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"a","b","c"}, []string{"d","e","f"}}
-	
-	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t) 
+	expectedData := [][]string{[]string{"a", "b", "c"}, []string{"d", "e", "f"}}
+
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
 
-func TestInterpRandomSubset (t *testing.T) {
+func TestInterpRandomSubset(t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv%1"))
 
 	random := rand.NewSource(100)
@@ -99,12 +100,12 @@ func TestInterpRandomSubset (t *testing.T) {
 		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"d","e","f"}}
-	
-	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t) 
+	expectedData := [][]string{[]string{"d", "e", "f"}}
+
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
 
-func TestInterpMinus (t *testing.T) {
+func TestInterpMinus(t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/minusData.csv - test_data/minusData2.csv"))
 
 	result := InterpProgramme(programme, nil, nil)
@@ -114,23 +115,37 @@ func TestInterpMinus (t *testing.T) {
 		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"a","b"}, []string{"c", "d"}}
-	
-	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t) 
+	expectedData := [][]string{[]string{"a", "b"}, []string{"c", "d"}}
+
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
 
-func TestInterpPlus (t *testing.T) {
+func TestInterpPlus(t *testing.T) {
 	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/simple.csv+test_data/simple2.csv"))
 
-	random := rand.NewSource(100)
-	result := InterpProgramme(programme, nil, &random)
+	result := InterpProgramme(programme, nil, nil)
 
 	expectedHeaders := []string{"h1", "h2", "h3", "h4"}
 	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
 		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
 	}
 
-	expectedData := [][]string{[]string{"a", "", "", "b"}, []string{"a","b","c",""}, []string{"d","e","f",""}}
-	
-	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t) 
+	expectedData := [][]string{[]string{"a", "", "", "b"}, []string{"a", "b", "c", ""}, []string{"d", "e", "f", ""}}
+
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
+}
+
+func TestInterpFilter(t *testing.T) {
+	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/minusData.csv filter test_data/minusData2.csv"))
+
+	result := InterpProgramme(programme, nil, nil)
+
+	expectedHeaders := []string{"h1", "h2"}
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
+		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a", "b"}, []string{"a", "b"}}
+
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
