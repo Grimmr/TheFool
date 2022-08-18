@@ -46,6 +46,10 @@ func interpNode(node *Parser.ParseTreeNode, buffers *BufferTable, random *rand.R
 		lhs := interpNode(node.Children[0], buffers, random)
 		rhs := interpNode(node.Children[1], buffers, random)
 		return lhs.OperatorPlus(rhs)
+	case Parser.LexTokenType_minus:
+		lhs := interpNode(node.Children[0], buffers, random)
+		rhs := interpNode(node.Children[1], buffers, random)
+		return lhs.OperatorMinus(rhs)
 	} 
 
 	return nil

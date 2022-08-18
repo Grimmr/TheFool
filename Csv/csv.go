@@ -9,7 +9,6 @@ import(
 	"math/rand"
 	"strconv"
 	"sort"
-	//"fmt"
 )
 
 type Csv struct {
@@ -372,6 +371,48 @@ func (this *Csv) OperatorLess(rhs *Csv) *Csv {
 
 		if matchRow(out.Headers, lhsRow, rhsRow) {
 			lhsPos++
+		} else if rowLessThen(out.Headers, lhsRow, rhsRow) {
+			out.insertRow(this.Data[this.Index[lhsPos]])
+			lhsPos++
+		} else  {
+			rhsPos++
+		}
+	}
+
+	//add the rest of lhs if any
+	for lhsPos < len(this.Data) {
+		out.insertRow(this.Data[this.Index[lhsPos]])
+		lhsPos++
+	}
+
+	return out
+}
+
+func (this *Csv) OperatorMinus(rhs *Csv) *Csv {
+	out := NewCsv()
+
+	//select headers
+	compHeaders := []string{}
+	for _, field := range this.Headers {
+		out.insertHeader(field)
+		for _, rhsField := range rhs.Headers {
+			if field == rhsField {
+				compHeaders = append(compHeaders, field)
+				break
+			}
+		}
+	}
+
+	//select from lhs
+	lhsPos := 0
+	rhsPos := 0
+	for lhsPos < len(this.Data) && rhsPos < len(rhs.Data) {
+		lhsRow := fitHeaders(compHeaders, this.Data[this.Index[lhsPos]])
+		rhsRow := fitHeaders(compHeaders, rhs.Data[rhs.Index[rhsPos]])
+
+		if matchRow(out.Headers, lhsRow, rhsRow) {
+			lhsPos++
+			rhsPos++
 		} else if rowLessThen(out.Headers, lhsRow, rhsRow) {
 			out.insertRow(this.Data[this.Index[lhsPos]])
 			lhsPos++

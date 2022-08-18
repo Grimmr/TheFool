@@ -383,6 +383,50 @@ func TestOperatorPlusMultiHeader (t *testing.T) {
 	CompareData(expected.Data, result.Data, true, t)
 }
 
+func TestOperatorMinusSimple (t *testing.T) {
+	lhsHeaders := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}, []string{"b"}, []string{"b"}, []string{"b"}}
+	lhs := ConstructTable(lhsHeaders, lhsData)
+
+	rhsHeaders := []string{"h1", "h2"}
+	rhsData := [][]string{[]string{"b", "a"}, []string{"b", "a"}}
+	rhs := ConstructTable(rhsHeaders, rhsData)
+
+	result := lhs.OperatorMinus(rhs)
+
+	expectedHeaders := []string{"h1"}
+	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a"}, []string{"b"}}
+	expected := ConstructTable(expectedHeaders, expectedData)
+
+	CompareData(expected.Data, result.Data, true, t)
+}
+
+func TestOperatorMinusTooManyInRhs (t *testing.T) {
+	lhsHeaders := []string{"h1"}
+	lhsData := [][]string{[]string{"a"}, []string{"b"}}
+	lhs := ConstructTable(lhsHeaders, lhsData)
+
+	rhsHeaders := []string{"h1"}
+	rhsData := [][]string{[]string{"b"}, []string{"b"}}
+	rhs := ConstructTable(rhsHeaders, rhsData)
+
+	result := lhs.OperatorMinus(rhs)
+
+	expectedHeaders := []string{"h1"}
+	if !reflect.DeepEqual(expectedHeaders,result.Headers) {
+		t.Errorf("expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a"}}
+	expected := ConstructTable(expectedHeaders, expectedData)
+
+	CompareData(expected.Data, result.Data, true, t)
+}
+
 func TestRowLessThen (t *testing.T) {
 	headers := []string{"1", "2", "3"}
 	data := [][]string{

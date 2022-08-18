@@ -7,9 +7,9 @@ import (
 //lexer only tests
 func TestLexProgrammeKeywords(t *testing.T) {
 	//should include one of every token
-	programme := "and or a.txt less()%+"
+	programme := "and or a.txt less()%+ -"
 	result := LexProgramme(programme)
-	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"'('", LexTokenType_lParen}, lexToken{"')'", LexTokenType_rParen}, lexToken{"%", LexTokenType_percent}, lexToken{"+", LexTokenType_plus}}
+	expected := []lexToken{lexToken{"and", LexTokenType_and}, lexToken{"or", LexTokenType_or}, lexToken{"a.txt", LexTokenType_name}, lexToken{"less", LexTokenType_less}, lexToken{"'('", LexTokenType_lParen}, lexToken{"')'", LexTokenType_rParen}, lexToken{"%", LexTokenType_percent}, lexToken{"+", LexTokenType_plus}, lexToken{"-", LexTokenType_minus}}
 
 	t.Logf("Lex returned %v", result)
 
@@ -164,6 +164,32 @@ func TestParsePlusBindsLikeAndOr(t *testing.T) {
 	}
 }
 
+func TestParseMinusSimple(t *testing.T) {
+	programme := "a - b"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(- (a) (b))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseMinusBindsTighterThenAndOr(t *testing.T) {
+	programme := "a - b and c - d"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(and (- (a) (b)) (- (c) (d)))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
+
+func TestParseMinusBindsLikeLess(t *testing.T) {
+	programme := "a - b less c - d"
+	result := WalkParseTree(ParseProgramme(LexProgramme(programme)))
+	expected := "(- (less (- (a) (b)) (c)) (d))"
+	if result != expected {
+		t.Fatalf("expected %s, got %s", expected, result)
+	}
+}
 
 //example programmes
 func TestParseProgrammeAndOr(t *testing.T) {
