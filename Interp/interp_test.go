@@ -149,3 +149,18 @@ func TestInterpFilter(t *testing.T) {
 
 	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
+
+func TestInterpNameWithSpace(t *testing.T) {
+	programme := Parser.ParseProgramme(Parser.LexProgramme("\"test_data/minus data.csv\" filter \"test_data/minus data2.csv\""))
+
+	result := InterpProgramme(programme, nil, nil)
+
+	expectedHeaders := []string{"h1", "h2"}
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
+		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := [][]string{[]string{"a", "b"}, []string{"a", "b"}}
+
+	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
+}

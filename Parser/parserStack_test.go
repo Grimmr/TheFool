@@ -24,6 +24,96 @@ func TestLexProgrammeKeywords(t *testing.T) {
 	}
 }
 
+func TestLexQoutesDontEffectNormalLex(t *testing.T) {
+	programme := "\"a\" and \"b\""
+	result := LexProgramme(programme)
+	expected := []lexToken{lexToken{"a", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"b", LexTokenType_name}}
+
+	t.Logf("Lex returned %v", result)
+
+	if len(result) != len(expected) {
+		t.Fatalf("Lex return wrong size, expected %d got %d", len(expected), len(result))
+	}
+
+	for index := range result {
+		if result[index] != expected[index] {
+			t.Errorf("Lex returned wrong token at index %d, expected %+v got %+v", index, expected[index], result[index])
+		}
+	}
+}
+
+func TestLexQoutesAllowSpaceInName(t *testing.T) {
+	programme := "\"a b\" and c"
+	result := LexProgramme(programme)
+	expected := []lexToken{lexToken{"a b", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"c", LexTokenType_name}}
+
+	t.Logf("Lex returned %v", result)
+
+	if len(result) != len(expected) {
+		t.Fatalf("Lex return wrong size, expected %d got %d", len(expected), len(result))
+	}
+
+	for index := range result {
+		if result[index] != expected[index] {
+			t.Errorf("Lex returned wrong token at index %d, expected %+v got %+v", index, expected[index], result[index])
+		}
+	}
+}
+
+func TestLexQoutesSpecialSymbolAtNameEnd(t *testing.T) {
+	programme := "\"a b%\" and c"
+	result := LexProgramme(programme)
+	expected := []lexToken{lexToken{"a b%", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"c", LexTokenType_name}}
+
+	t.Logf("Lex returned %v", result)
+
+	if len(result) != len(expected) {
+		t.Fatalf("Lex return wrong size, expected %d got %d", len(expected), len(result))
+	}
+
+	for index := range result {
+		if result[index] != expected[index] {
+			t.Errorf("Lex returned wrong token at index %d, expected %+v got %+v", index, expected[index], result[index])
+		}
+	}
+}
+
+func TestLexQoutesAllowKeywordAsName(t *testing.T) {
+	programme := "\"and\" and c"
+	result := LexProgramme(programme)
+	expected := []lexToken{lexToken{"and", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"c", LexTokenType_name}}
+
+	t.Logf("Lex returned %v", result)
+
+	if len(result) != len(expected) {
+		t.Fatalf("Lex return wrong size, expected %d got %d", len(expected), len(result))
+	}
+
+	for index := range result {
+		if result[index] != expected[index] {
+			t.Errorf("Lex returned wrong token at index %d, expected %+v got %+v", index, expected[index], result[index])
+		}
+	}
+}
+
+func TestLexQoutesMidBufferOk(t *testing.T) {
+	programme := "\"a \"b and c"
+	result := LexProgramme(programme)
+	expected := []lexToken{lexToken{"a b", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"c", LexTokenType_name}}
+
+	t.Logf("Lex returned %v", result)
+
+	if len(result) != len(expected) {
+		t.Fatalf("Lex return wrong size, expected %d got %d", len(expected), len(result))
+	}
+
+	for index := range result {
+		if result[index] != expected[index] {
+			t.Errorf("Lex returned wrong token at index %d, expected %+v got %+v", index, expected[index], result[index])
+		}
+	}
+}
+
 // WalkParseTree tests
 func TestWalkParseTree(t *testing.T) {
 	programme := &ParseTreeNode{lexToken{"and", LexTokenType_and}, []*ParseTreeNode{&ParseTreeNode{lexToken{"or", LexTokenType_or}, []*ParseTreeNode{&ParseTreeNode{lexToken{"a", LexTokenType_name}, nil}, &ParseTreeNode{lexToken{"b", LexTokenType_name}, nil}}}, &ParseTreeNode{lexToken{"c", LexTokenType_name}, nil}}}
