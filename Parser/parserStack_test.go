@@ -24,7 +24,7 @@ func TestLexProgrammeKeywords(t *testing.T) {
 	}
 }
 
-func TestLexQoutesDontEffectNormalLex(t *testing.T) {
+func TestLexQuotesDontEffectNormalLex(t *testing.T) {
 	programme := "\"a\" and \"b\""
 	result := LexProgramme(programme)
 	expected := []lexToken{lexToken{"a", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"b", LexTokenType_name}}
@@ -42,7 +42,7 @@ func TestLexQoutesDontEffectNormalLex(t *testing.T) {
 	}
 }
 
-func TestLexQoutesAllowSpaceInName(t *testing.T) {
+func TestLexQuotesAllowSpaceInName(t *testing.T) {
 	programme := "\"a b\" and c"
 	result := LexProgramme(programme)
 	expected := []lexToken{lexToken{"a b", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"c", LexTokenType_name}}
@@ -60,7 +60,7 @@ func TestLexQoutesAllowSpaceInName(t *testing.T) {
 	}
 }
 
-func TestLexQoutesSpecialSymbolAtNameEnd(t *testing.T) {
+func TestLexQuotesSpecialSymbolAtNameEnd(t *testing.T) {
 	programme := "\"a b%\" and c"
 	result := LexProgramme(programme)
 	expected := []lexToken{lexToken{"a b%", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"c", LexTokenType_name}}
@@ -78,7 +78,7 @@ func TestLexQoutesSpecialSymbolAtNameEnd(t *testing.T) {
 	}
 }
 
-func TestLexQoutesAllowKeywordAsName(t *testing.T) {
+func TestLexQuotesAllowKeywordAsName(t *testing.T) {
 	programme := "\"and\" and c"
 	result := LexProgramme(programme)
 	expected := []lexToken{lexToken{"and", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"c", LexTokenType_name}}
@@ -96,7 +96,7 @@ func TestLexQoutesAllowKeywordAsName(t *testing.T) {
 	}
 }
 
-func TestLexQoutesMidBufferOk(t *testing.T) {
+func TestLexQuotesMidBufferOk(t *testing.T) {
 	programme := "\"a \"b and c"
 	result := LexProgramme(programme)
 	expected := []lexToken{lexToken{"a b", LexTokenType_name}, lexToken{"and", LexTokenType_and}, lexToken{"c", LexTokenType_name}}

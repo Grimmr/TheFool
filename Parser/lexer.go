@@ -26,17 +26,17 @@ func LexProgramme(prog string) []lexToken {
 
 	//append a dummy whitespace to the back of the programme so we don't have to manually flush the buffer at EOF
 	prog += " "
-	qoutes := false
-	qouteBuffer := false
+	quotes := false
+	quoteBuffer := false
 
 	for _, letter := range prog {
 		if letter == '"' {
-			qoutes = !qoutes
-			qouteBuffer = true
-		} else if isBufferChar(letter) || qoutes {
+			quotes = !quotes
+			quoteBuffer = true
+		} else if isBufferChar(letter) || quotes {
 			buffer += string(letter)
 		} else {
-			if qouteBuffer {
+			if quoteBuffer {
 				if len(buffer) != 0 {
 					out = append(out, lexToken{buffer, LexTokenType_name})
 				}
@@ -59,7 +59,7 @@ func LexProgramme(prog string) []lexToken {
 				}
 			}
 			buffer = ""
-			qouteBuffer = false
+			quoteBuffer = false
 
 			switch letter {
 			case '(':
