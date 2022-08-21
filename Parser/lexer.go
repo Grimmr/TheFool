@@ -3,7 +3,7 @@ package Parser
 type lexTokenType int
 
 type lexToken struct {
-	Literal string
+	Literal   string
 	TokenType lexTokenType
 }
 
@@ -22,32 +22,44 @@ const (
 
 func LexProgramme(prog string) []lexToken {
 	var out []lexToken //10 is an abitry starting value for a dynamic array
-	var buffer string //used to store multicharacter token literals during lexing
+	var buffer string  //used to store multicharacter token literals during lexing
 
 	//append a dummy whitespace to the back of the programme so we don't have to manually flush the buffer at EOF
 	prog += " "
+	quotes := false
+	quoteBuffer := false
 
 	for _, letter := range prog {
-		if(isBufferChar(letter)) {
+		if letter == '"' {
+			quotes = !quotes
+			quoteBuffer = true
+		} else if isBufferChar(letter) || quotes {
 			buffer += string(letter)
 		} else {
-			switch buffer {
-			case "and": 
-				out = append(out, lexToken{buffer, LexTokenType_and})
-			case "or": 
-				out = append(out, lexToken{buffer, LexTokenType_or})
-			case "less":
-				out = append(out, lexToken{buffer, LexTokenType_less})
-			case "-":
-				out = append(out, lexToken{buffer, LexTokenType_minus})
-			case "filter":
-				out = append(out, lexToken{buffer, LexTokenType_filter})
-			default:
+			if quoteBuffer {
 				if len(buffer) != 0 {
 					out = append(out, lexToken{buffer, LexTokenType_name})
 				}
+			} else {
+				switch buffer {
+				case "and":
+					out = append(out, lexToken{buffer, LexTokenType_and})
+				case "or":
+					out = append(out, lexToken{buffer, LexTokenType_or})
+				case "less":
+					out = append(out, lexToken{buffer, LexTokenType_less})
+				case "-":
+					out = append(out, lexToken{buffer, LexTokenType_minus})
+				case "filter":
+					out = append(out, lexToken{buffer, LexTokenType_filter})
+				default:
+					if len(buffer) != 0 {
+						out = append(out, lexToken{buffer, LexTokenType_name})
+					}
+				}
 			}
 			buffer = ""
+			quoteBuffer = false
 
 			switch letter {
 			case '(':
@@ -66,7 +78,7 @@ func LexProgramme(prog string) []lexToken {
 }
 
 func isBufferChar(target rune) bool {
-	for _, char := range []rune{'(',')','%',' ','\n', '+'} {
+	for _, char := range []rune{'(', ')', '%', ' ', '\n', '+', '"'} {
 		if char == target {
 			return false
 		}

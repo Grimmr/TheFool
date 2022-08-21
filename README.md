@@ -12,6 +12,17 @@ go build .
 ```
 ## Usage
 TheFool takes a single expression to evaluate and prints the resulting csv table to stdout. 
+
+### Filenames
+The most basic part of an expression is a filename. Filenames that contain spaces or that are the same as a reserved keyword (see Operators) need to be surrounded in quotes. Note that quotes are parsed out of expressions (like in bash) so the following are functionally identical
+```
+"a file.txt"
+"a "file.txt
+a" "file.txt
+"a file".txt
+```
+Also keep in mind that some environments (like bash) will consume quotes before they reach TheFool and may need to be escaped.
+
 ### Example usage
 ```
 TheFool dogs.csv less myDogs.csv > notMyDogs.csv
