@@ -455,7 +455,7 @@ func TestOperatorFilterHeaderMissmatch(t *testing.T) {
 	lhs := ConstructTable(lhsHeaders, lhsData)
 
 	rhsHeaders := []string{"h1", "h3"}
-	rhsData := [][]string{[]string{"b", "a"}, []string{"b", "a"}}
+	rhsData := [][]string{[]string{"b", "a"}, []string{"b", "a"}, []string{"b", "a"}, []string{"b", "a"}, []string{"b", "a"}}
 	rhs := ConstructTable(rhsHeaders, rhsData)
 
 	result := lhs.OperatorFilter(rhs)

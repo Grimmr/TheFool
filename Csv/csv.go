@@ -562,10 +562,6 @@ func (this *Csv) OperatorFilter(rhs *Csv) *Csv {
 		}
 	}
 
-	for ; lhsPos < len(this.Data); lhsPos++ {
-		out.insertRow(this.Data[this.Index[lhsPos]])
-	}
-
 	return out
 }
 
