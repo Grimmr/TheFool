@@ -164,3 +164,20 @@ func TestInterpNameWithSpace(t *testing.T) {
 
 	Csv.CompareData(Csv.ConstructTable(expectedHeaders, expectedData).Data, result.Data, true, t)
 }
+
+func TestRegression1(t *testing.T) {
+	programme := Parser.ParseProgramme(Parser.LexProgramme("test_data/regression1/in1.csv filter test_data/regression1/in2.csv"))
+
+	result := InterpProgramme(programme, nil, nil)
+	expect := Csv.NewCsv()
+	expect.Read("test_data/regression1/out.csv")
+
+	expectedHeaders := expect.Headers
+	if !reflect.DeepEqual(expectedHeaders, result.Headers) {
+		t.Errorf("headers: expected %v, got %v", expectedHeaders, result.Headers)
+	}
+
+	expectedData := expect.Data
+
+	Csv.CompareData(expectedData, result.Data, true, t)
+}
